@@ -1,0 +1,38 @@
+\documentclass[onecolumn, a4paper,11pt, headings=small]{scrreport}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage[english]{babel}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage[left=1.7cm, right=1.7cm, top=2cm, bottom=2.3cm]{geometry}
+
+\usepackage{enumitem}
+\setlist[description]{leftmargin=\parindent}%, noitemsep
+
+\RedeclareSectionCommands[
+  beforeskip=-.75\baselineskip,
+  afterskip=.3\baselineskip
+]{section, subsection, subsubsection}
+
+% avoid making a new page for each chapter
+\RedeclareSectionCommand[style=section]{chapter}
+
+\begin{document}
+\author{Cay Rahn}
+\date{\today}
+\title{Investigating the molecular cause of hypermobile Ehlers-Danlos syndrome}
+\subtitle{MSB 1014 - Network Biology}
+
+\maketitle
+
+\tableofcontents
+\clearpage
+
+\input{doc/101-introduction}
+\input{doc/102-methods}
+\input{doc/103-results}
+\input{doc/104-discussion}
+
+\bibliographystyle{vancouver.bst}
+\bibliography{references.bib}
+\end{document}
