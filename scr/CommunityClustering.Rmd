@@ -1,0 +1,155 @@
+---
+title: "Community Clustering"
+output: html_notebook
+---
+
+```{r}
+BiocManager::install(c("igraph", "RCy3", "clusterProfiler", "org.Hs.eg.db"))
+```
+
+
+```{r}
+library(RCy3)
+library(igraph)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+
+
+cytoscapePing ()
+```
+
+```{r}
+networkSuid = getNetworkSuid()
+print(networkSuid)
+```
+
+```{r}
+commandsHelp("help cluster")
+```
+
+```{r}
+# minimum number of nodes to create a new network out of the cluster
+nodeThreshold <- 15
+```
+
+# Clustering in cytoscape
+```{r}
+clustermaker = paste("cluster glay network=SUID:", networkSuid, sep="")
+res <- commandsGET(clustermaker)
+num <- as.numeric(gsub("Clusters: ", "", res[1]))
+print(paste("Found", num, "clusters"))
+
+clusterNumber <- 0
+# for each cluster
+for(i in 1:num) {
+  setCurrentNetwork(network=networkSuid)
+  clearSelection(network=networkSuid)
+  currentCluster <- i
+  selectedNodes <- selectNodes(network=networkSuid, currentCluster, by.col="__glayCluster") 
+  if(length(selectedNodes$nodes) > nodeThreshold) {
+    clusterNumber <- clusterNumber + 1
+    # sub network creation
+    subnetwork_suid <- createSubnetwork(nodes="selected", network=networkSuid)
+    table <- getTableColumns(table="node",columns = c("display name", "Ensembl", "Entrez Gene"), network = as.numeric(subnetwork_suid))
+    # save network
+    exportNetwork(paste("data/networks/glay/glay_cluster_", clusterNumber, ".sif", sep=""), network=subnetwork_suid)
+    res <- clusterProfiler::enrichGO(
+      gene = table$`display name`,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "BP",
+      pAdjustMethod ="BH",
+      pvalueCutoff = 0.05,
+      qvalueCutoff = 0.05,
+      readable = TRUE
+      )
+    res.df <- as.data.frame(res)
+    write.table(res.df, file=paste('data/enrichment/biological-process/glay_cluster', clusterNumber, '_bp.txt', sep=""), row.names=F, sep=",")
+    write.table(table, file=paste("data/networks/glay/glay_cluster", clusterNumber,"_nodes.txt", sep=""), row.names=F, sep=",")
+    assign(paste("glay_Cluster_", clusterNumber, sep=""), res.df)
+    barplot(res, showCategory = 20, title = paste("Biological process glay cluster", clusterNumber))
+  }
+}
+```
+## Enrichment for Biological Process
+```{r}
+enrichmentBiologicalProcess <- function(i) {
+  tableCluster <- read.csv(paste("data/networks/glay/glay_cluster", i,"_nodes.txt", sep=""), header=TRUE)
+  res <- clusterProfiler::enrichGO(
+      gene = tableCluster$`display.name`,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "BP",
+      pAdjustMethod ="BH",
+      pvalueCutoff = 0.05,
+      qvalueCutoff = 0.05,
+      readable = TRUE
+      )
+  res.df <- as.data.frame(res)
+  barplot(res, showCategory = 15, title = paste("Biological Process glay cluster", i), font.size = 9)
+}
+```
+
+```{r}
+enrichmentBiologicalProcess(1)
+```
+```{r}
+enrichmentBiologicalProcess(2)
+```
+
+```{r}
+enrichmentBiologicalProcess(3)
+```
+
+```{r}
+enrichmentBiologicalProcess(4)
+```
+
+```{r}
+enrichmentBiologicalProcess(5)
+```
+
+```{r}
+enrichmentBiologicalProcess(6)
+```
+## Analyse for cellular component as well
+```{r}
+enrichmentCellularComponent <- function(i) {
+  tableCluster <- read.csv(paste("data/networks/glay/glay_cluster", i,"_nodes.txt", sep=""), header=TRUE)
+  res <- clusterProfiler::enrichGO(
+      gene = tableCluster$`display.name`,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "CC",
+      pAdjustMethod ="BH",
+      pvalueCutoff = 0.05,
+      qvalueCutoff = 0.05,
+      readable = TRUE
+      )
+  res.df <- as.data.frame(res)
+  barplot(res, showCategory = 15, title = paste("Cellular Component glay cluster", i), font.size = 9)
+}
+```
+
+```{r}
+enrichmentCellularComponent(1)
+```
+```{r}
+enrichmentCellularComponent(2)
+```
+
+```{r}
+enrichmentCellularComponent(3)
+```
+
+```{r}
+enrichmentCellularComponent(4)
+```
+
+```{r}
+enrichmentCellularComponent(5)
+```
+
+```{r}
+enrichmentCellularComponent(6)
+```
