@@ -1,1 +1,7 @@
 report/.texpadtmp/**
+.Rproj.user
+*.nb.html
+**/GEO2R.GSE218012.results/**
+.idea/**
+**/.Rhistory
+scr/data/**

@@ -1,0 +1,251 @@
+---
+title: "From Geo2R"
+output: html_notebook
+---
+
+```{r}
+# Version info: R 4.2.2, Biobase 2.58.0, GEOquery 2.66.0, limma 3.54.0
+################################################################
+#   Differential expression analysis with DESeq2
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+```
+
+```{r}
+BiocManager::install("DESeq2")
+BiocManager::install("clusterProfiler")
+```
+
+```{r}
+library(Biobase)
+library(GEOquery)
+library(limma)
+library(DESeq2)
+library(clusterProfiler)
+```
+
+Because I analyse locally, I need the gset and to set a results directory
+
+```{r}
+resfolder <- "GEO2R.GSE218012.results"
+if (! file.exists(resfolder) ){
+  dir.create(resfolder, showWarnings = FALSE, recursive = FALSE, mode = "0777")
+  Sys.chmod(resfolder, mode = "0777", use_umask=TRUE)
+}
+if (! exists("gset") ){
+  gset <- getGEO("GSE218012", destdir = resfolder, GSEMatrix =TRUE)
+}
+```
+
+Loading Data and loading groups etc.
+
+```{r}
+# load counts table from GEO
+urld <- "https://www.ncbi.nlm.nih.gov/geo/download/?format=file&type=rnaseq_counts"
+path <- paste(urld, "acc=GSE218012", "file=GSE218012_raw_counts_GRCh38.p13_NCBI.tsv.gz", sep="&");
+tbl <- as.matrix(data.table::fread(path, header=T, colClasses="integer"), rownames="GeneID")
+
+# load gene annotations 
+apath <- paste(urld, "type=rnaseq_counts", "file=Human.GRCh38.p13.annot.tsv.gz", sep="&")
+annot <- data.table::fread(apath, header=T, quote="", stringsAsFactors=F, data.table=F)
+rownames(annot) <- annot$GeneID
+```
+
+```{r}
+# sample selection
+gsms <- paste0("11111111111111111111111111111111111111111111111111",
+        "11111111111111111111111111111111111111111111111111",
+        "00000000000000000000000000000000000000000000000000",
+        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+sml <- strsplit(gsms, split="")[[1]]
+
+# filter out excluded samples (marked as "X")
+sel <- which(sml != "X")
+sml <- sml[sel]
+tbl <- tbl[ ,sel]
+
+# group membership for samples
+gs <- factor(sml)
+groups <- make.names(c("hEDS","control"))
+levels(gs) <- groups
+sample_info <- data.frame(Group = gs, row.names = colnames(tbl))
+
+# pre-filter low count genes
+# keep genes with at least N counts > 10, where N = size of smallest group
+keep <- rowSums( tbl >= 10 ) >= min(table(gs))
+tbl <- tbl[keep, ]
+
+ds <- DESeqDataSetFromMatrix(countData=tbl, colData=sample_info, design= ~Group)
+
+ds <- DESeq(ds, test="Wald", sfType="poscount")
+```
+## Set thresholds for p-value and log2FoldChange for plots
+```{r}
+log2FCThreshold = 0.5
+pValueThreshold = 0.05
+```
+
+## Differentially expressed genes
+
+```{r}
+# extract results for top genes table
+r <- results (ds, contrast=c("Group", groups[1], groups[2]), alpha=0.05, pAdjustMethod ="fdr")
+
+# tT <- r[order(r$padj)[1:250],]
+tT <- r[order(r$padj),]
+tT <- merge(as.data.frame(tT), annot, by=0, sort=F)
+
+tT <- subset(tT, select=c("EnsemblGeneID","GeneID","padj","pvalue","lfcSE","stat","log2FoldChange","baseMean","Symbol","Description"))
+# save all in a file
+write.table(tT, file='data/deg.txt', row.names=F, sep=",")
+tT
+```
+
+## Look only at DEG with p-value <= 0.05 and |log2FoldChange| >= 0.5
+```{r}
+geneIDs <- subset(tT, select="GeneID", padj<=pValueThreshold& abs(log2FoldChange) >= log2FCThreshold)
+print(length(geneIDs$GeneID))
+```
+
+
+```{r}
+geneIDs <- subset(tT, select=c("EnsemblGeneID", "GeneID", "Symbol"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)
+write.table(geneIDs, file='data/DEG_thresholded.txt', row.names=F, sep=",")
+```
+
+## There are some genes without ensemblID, have a closer look there
+```{r}
+relevantWithoutEnsembl <- subset(tT, select=c("EnsemblGeneID", "GeneID", "Symbol"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold & EnsemblGeneID == "")
+write.table(relevantWithoutEnsembl, file='data/DEG_thresholded_Ensembl_missing.txt', row.names=F, sep=",")
+relevantWithoutEnsembl
+```
+
+## Look at amount of up and downregulated genes
+```{r}
+upregulated = subset(tT, select="Symbol", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold & log2FoldChange > 0)$Symbol
+downregulated = subset(tT, select="Symbol", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold & log2FoldChange < 0)$Symbol
+print(length(upregulated))
+print(length(downregulated))
+```
+
+
+## Dispersion Estimates
+
+```{r}
+plotDispEsts(ds, main="GSE218012 Dispersion Estimates")
+```
+
+## Histogram of p-values
+
+```{r}
+# create histogram plot of p-values
+hist(r$padj, breaks=seq(0, 1, length = 21), col = "grey", border = "white", 
+         xlab = "", ylab = "", main = "GSE218012 Frequencies of padj-values")
+```
+
+## Volcano plot
+
+```{r}
+# volcano plot
+old.pal <- palette(c("#00BFFF", "#FF3030")) # low-hi colors
+par(mar=c(4,4,2,1), cex.main=1.5)
+plot(r$log2FoldChange, -log10(r$padj), main=paste(groups[1], "vs", groups[2]),
+     xlab="log2FC", ylab="-log10(Padj)", pch=20, cex=0.5)
+with(subset(r, padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold),
+     points(log2FoldChange, -log10(padj), pch=20, col=(sign(log2FoldChange) + 3)/2, cex=1))
+legend("bottomleft", title=paste("Padj<", 0.05, sep=""), legend=c("down", "up"), pch=20,col=1:2)
+```
+
+## Mean difference (MD) plot
+
+log2 fold change vs. average log2 expression to visualize differentially expressed genes
+
+```{r}
+# MD plot
+par(mar=c(4,4,2,1), cex.main=1.5)
+plot(log10(r$baseMean), r$log2FoldChange, main=paste(groups[1], "vs", groups[2]),
+     xlab="log10(mean of normalized counts)", ylab="log2FoldChange", pch=20, cex=0.5)
+
+with(subset(r, padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold),
+     points(log10(baseMean), log2FoldChange, pch=20, col=(sign(log2FoldChange) + 3)/2, cex=1))
+legend("bottomleft", title=paste("Padj<", 0.05, sep=""), legend=c("down", "up"), pch=20,col=1:2)
+abline(h=0)
+palette(old.pal) # restore palette
+```
+
+## General expression data visualization
+
+-   distribution of the values of the selected samples
+
+```{r}
+################################################################
+#   General expression data visualization
+dat <- log10(counts(ds, normalized = T) + 1) # extract normalized counts
+
+# box-and-whisker plot
+lbl <- "log10(raw counts + 1)"
+dev.new(width=3+ncol(gset)/6, height=5)
+ord <- order(gs)  # order samples by group
+palette(c("#1B9E77", "#7570B3", "#E7298A", "#E6AB02", "#D95F02",
+          "#66A61E", "#A6761D", "#B32424", "#B324B3", "#666666"))
+par(mar=c(7,4,2,1))
+boxplot(dat[,ord], boxwex=0.6, notch=T, main="GSE218012", ylab="lg(norm.counts)", outline=F, las=2, col=gs[ord])
+legend("topleft", groups, fill=palette(), bty="n")
+```
+
+## Uniform Manifold Approximation and Projection (UMAP) plot
+
+Dimensionality reduction to visualize how samples are related to each other
+
+```{r}
+# UMAP plot (multi-dimensional scaling)
+library(umap)
+dat <- dat[!duplicated(dat), ] # first remove duplicates
+par(mar=c(3,3,2,6), xpd=TRUE, cex.main=1.5)
+ump <- umap(t(dat), n_neighbors = 15, random_state = 123)
+plot(ump$layout, main="UMAP plot, nbrs=15", xlab="", ylab="", col=gs, pch=20, cex=1.5)
+legend("topright", inset=c(-0.15,0), legend=groups, pch=20,
+       col=1:length(groups), title="Group", pt.cex=1.5)
+```
+
+For the final network, where we query the known EDS genes of other types, it is interesting to retrieve the pValues and log2FoldChange for those as well, even if there are not differentially expressed under the chosen conditions.
+
+```{r}
+# extract all results
+r_eds <- results (ds, contrast=c("Group", groups[1], groups[2]), alpha=0.99999, lfcThreshold=0, altHypothesis ="greaterAbs", pAdjustMethod ="fdr")
+
+tT_eds <- r_eds[order(r_eds$padj),]
+tT_eds <- merge(as.data.frame(tT_eds), annot, by=0, sort=F)
+
+eds_symbols = c("ADAMTS2",
+"AEBP1",
+"B3GALT6",
+"B4GALT7",
+"C1R",
+"C1S",
+"CCBE1",
+"CHST14",
+"COL12A1",
+"COL1A1",
+"COL1A2",
+"COL3A1",
+"COL5A1",
+"COL5A2",
+"DSE",
+"FKBP14",
+"PLOD1",
+"PRDM5",
+"SLC39A13",
+"SLC6A5",
+"TNXB",
+"ZNF469"
+)
+
+tT_eds <- subset(tT_eds, Symbol %in% eds_symbols)
+
+tT_eds <- subset(tT_eds, select=c("GeneID","padj","pvalue","lfcSE","stat","log2FoldChange","baseMean","Symbol","Description"))
+#write.table(tT, file=stdout(), row.names=F, sep="\t")
+# tT <- subset(tT, select=c("GeneID","padj","pvalue","lfcSE","stat","log2FoldChange","baseMean","Symbol","Description"), padj<pValueThreshold & abs(log2FCThreshold) >= log2FCThreshold)
+write.table(tT_eds, file='data/eds_expression.txt', row.names=F, sep=",")
+tT_eds
+```
