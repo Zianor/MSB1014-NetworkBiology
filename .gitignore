@@ -5,3 +5,4 @@ report/.texpadtmp/**
 .idea/**
 **/.Rhistory
 scr/data/**
+*.cys
