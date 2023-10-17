@@ -1,4 +1,4 @@
-\documentclass[onecolumn, a4paper,11pt, headings=small]{scrreport}
+\documentclass[onecolumn, a4paper,11pt, headings=small, titlepage=true]{scrartcl}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
@@ -9,13 +9,13 @@
 \usepackage{enumitem}
 \setlist[description]{leftmargin=\parindent}%, noitemsep
 
+% Remove page number from titlepage
+\renewcommand*{\titlepagestyle}{empty}
+
 \RedeclareSectionCommands[
-  beforeskip=-.75\baselineskip,
+  beforeskip=.5\baselineskip,
   afterskip=.3\baselineskip
 ]{section, subsection, subsubsection}
-
-% avoid making a new page for each chapter
-\RedeclareSectionCommand[style=section]{chapter}
 
 \begin{document}
 \author{Cay Rahn - 6255648}
@@ -25,8 +25,9 @@
 
 \maketitle
 
-\tableofcontents
 \clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 % 2-3 pages without title page, figures, tables and references
 % max 5 figures/tables - every figure/table has a caption title and descrption
