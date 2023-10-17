@@ -1,0 +1,144 @@
+---
+title: "MCODE Clustering"
+output: html_notebook
+---
+
+```{r}
+BiocManager::install(c("igraph", "RCy3", "clusterProfiler", "org.Hs.eg.db"))
+```
+# Get libraries
+```{r}
+library(RCy3)
+library(igraph)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+
+
+cytoscapePing ()
+```
+
+```{r}
+networkSuid = getNetworkSuid()
+print(networkSuid)
+```
+
+```{r}
+commandsHelp("help cluster")
+```
+
+```{r}
+# minimum number of nodes to create a new network out of the cluster
+nodeThreshold <- 15
+```
+# Perform clustering and save clusters
+```{r}
+clustermaker = paste("cluster mcode network=SUID:", networkSuid, sep="")
+res <- commandsGET(clustermaker)
+num <- as.numeric(gsub("Clusters: ", "", res[1]))
+print(paste("Found", num, "clusters"))
+
+clusterNumber = 0
+# for each cluster
+for(i in 1:num) {
+  setCurrentNetwork(network=networkSuid)
+  clearSelection(network=networkSuid)
+  currentCluster <- i
+  selectedNodes <- selectNodes(network=networkSuid, currentCluster, by.col="__mcodeCluster") 
+  print(paste("Cluster", i, "has", length(selectedNodes$nodes), "nodes"))
+  if(length(selectedNodes$nodes) > nodeThreshold) {
+    # sub network creation
+    # cluster numbers of clusters with #nodes > nodeThreshold
+    clusterNumber = clusterNumber + 1
+    
+    # export subnetwork
+    subnetwork_suid <- createSubnetwork(nodes="selected", network=networkSuid)
+    exportNetwork(paste("data/networks/MCODE/mcode_cluster_", clusterNumber, ".sif", sep=""), network=subnetwork_suid)
+    
+    # export nodes of subnetwork
+    table <- getTableColumns(table="node",columns = c("display name", "Ensembl", "Entrez Gene"), network = as.numeric(subnetwork_suid))
+    write.table(table, file=paste("data/networks/MCODE/mcode_cluster_", clusterNumber,"_nodes.txt", sep=""), row.names=F, sep=",")
+    
+    res <- clusterProfiler::enrichGO(
+      gene = table$`display name`,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "MF",
+      pAdjustMethod ="BH",
+      pvalueCutoff = 0.05,
+      qvalueCutoff = 0.05,
+      readable = TRUE
+      )
+
+    res.df <- as.data.frame(res)
+    
+    # save enrichment results
+    write.table(res.df, file=paste('data/enrichment/molecular-function/mcode_cluster', clusterNumber, '_go.txt', sep=""), row.names=F, sep=",")
+    
+    assign(paste("MCODE_Cluster_", clusterNumber, sep=""), res.df)
+    # plot enrichment results
+    barplot(res, showCategory = 10, title = paste("Molecular Function MCODE cluster", clusterNumber))
+  }
+}
+```
+
+```{r}
+plotClusterEnrichment <- function(i) {
+  tableCluster <- read.csv(paste("data/networks/MCODE/mcode_cluster_", i,"_nodes.txt", sep=""), header=TRUE)
+  resCluster <- clusterProfiler::enrichGO(
+      gene = tableCluster$`display.name`,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "MF",
+      pAdjustMethod ="BH",
+      pvalueCutoff = 0.05,
+      qvalueCutoff = 0.05,
+      readable = TRUE
+      )
+  resCluster.df <- as.data.frame(resCluster)
+  head(resCluster.df)
+  barplot(resCluster, showCategory = 15, title = paste("Molecular Function MCODE cluster ",i, sep=""), font.size=9)
+}
+```
+
+
+```{r}
+plotClusterEnrichment(1)
+```
+
+```{r}
+plotClusterEnrichment(2)
+```
+
+```{r}
+plotClusterEnrichment(3)
+```
+
+We do not only want over-representation analysis, but to include the order from the log fold change. For this, I need the original list of differentially expressed genes again.
+
+
+```{r}
+i <- 1
+# load the gene symbols
+tableCluster <- read.csv(paste("data/networks/MCODE/mcode_cluster_", i,"_nodes.txt", sep=""), header=TRUE)
+deg_df <- read.csv("data/deg.txt", header=TRUE)
+log2FCThreshold <- 0.5
+pValueThreshold <- 0.05
+deg_cluster <- subset(deg_df, GeneID %in% tableCluster$`Entrez.Gene`)
+print(length(deg_cluster$GeneID))
+# create the ordered list we need
+geneList <- subset(deg_cluster, select=c("GeneID", "log2FoldChange"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)
+foldChange <- geneList$log2FoldChange
+geneListOrdered <- setNames(foldChange, as.character(geneList$GeneID))
+geneListOrdered <- sort(geneListOrdered, decreasing=T)
+```
+
+With this we can do gene set enrichment (still molecular function)
+TODO: does this make sense here? Because we already have a cluster, so overrepresentation should mean more than this?
+```{r}
+# for cluster 1, we have only upregulated genes, thats why std scoring does not work
+enrichmentGo <- gseGO(geneListOrdered, "org.Hs.eg.db", ont="MF", scoreType="pos")
+head(enrichmentGo, 20)
+```
+
+
+
