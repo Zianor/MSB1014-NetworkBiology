@@ -1,0 +1,240 @@
+a
+---
+title: "Enrichment"
+output: html_notebook
+---
+
+```{r}
+library(BiocManager)
+BiocManager::install("clusterProfiler")
+BiocManager::install("pathview")
+BiocManager::install("ReactomePA")
+```
+
+```{r}
+library("clusterProfiler")
+```
+
+```{r}
+df = read.csv("data/deg.txt", header=TRUE)
+df
+```
+```{r}
+pValueThreshold <- 0.05
+log2FCThreshold <- 0.5
+geneList <- subset(tT, select=c("GeneID", "log2FoldChange"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)
+foldChange <- geneList$log2FoldChange
+geneListOrdered <- setNames(foldChange, as.character(geneList$GeneID))
+geneListOrdered <- sort(geneListOrdered, decreasing=T)
+```
+## Gene Ontology
+### Molecular function
+#### Go classification
+```{r}
+geneIDs <- as.character(subset(tT, select="GeneID", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)$GeneID)
+ggo_mf <- groupGO(
+  gene=geneIDs,
+  "org.Hs.eg.db",
+  ont="MF",
+  level=3,
+  readable=TRUE
+)
+ggo_mf <- ggo_mf[order(ggo_mf$Count, decreasing=T),]
+head(ggo_mf, 25)
+```
+#### Overrepresentation
+```{r}
+ego_mf <- enrichGO(gene=geneIDs, "org.Hs.eg.db", ont = "MF", readable = T, pvalueCutoff = 0.05)
+head(ego_mf,20)
+```
+```{r}
+barplot(ego_mf, showCategory = 20, title = "Molecular Function")
+```
+
+```{r}
+goplot(ego_mf)
+```
+#### Go enrichment
+```{r}
+enrichmentGo_mf <- gseGO(geneListOrdered, "org.Hs.eg.db", ont="MF")
+head(enrichmentGo_mf, 20)
+```
+### Cellular component
+#### Go classification
+```{r}
+ggo_cc <- groupGO(
+  gene=geneIDs,
+  "org.Hs.eg.db",
+  ont="CC",
+  level=3,
+  readable=TRUE
+)
+ggo_cc <- ggo_cc[order(ggo_cc$Count, decreasing=T),]
+head(ggo_cc, 25)
+```
+#### Overrepresentation
+```{r}
+ego_cc <- enrichGO(gene=geneIDs, "org.Hs.eg.db", ont = "CC", readable = T, pvalueCutoff = 0.05)
+head(ego_cc,20)
+```
+```{r}
+barplot(ego_cc, showCategory = 15, title = "Cellular Component", font.size = 8)
+```
+```{r}
+goplot(ego_cc)
+```
+
+#### Go enrichment
+```{r}
+enrichmentGo_cc <- gseGO(geneListOrdered, "org.Hs.eg.db", ont="CC")
+head(enrichmentGo_cc, 20)
+```
+### Biological process
+
+#### Go classification
+```{r}
+ggo_bp <- groupGO(
+  gene=geneIDs,
+  "org.Hs.eg.db",
+  ont="BP",
+  level=3,
+  readable=TRUE
+)
+ggo_bp <- ggo_bp[order(ggo_bp$Count, decreasing=T),]
+head(ggo_bp, 25)
+```
+#### Overrepresentation
+```{r}
+ego_bp <- enrichGO(gene=geneIDs, "org.Hs.eg.db", ont = "BP", readable = T, pvalueCutoff = 0.05)
+head(ego_bp,20)
+```
+```{r}
+barplot(ego_bp, showCategory = 15, title = "Biological Process", font.size = 8)
+```
+
+```{r}
+goplot(ego_bp)
+```
+
+#### Go enrichment
+```{r}
+enrichmentGo_bp <- gseGO(geneListOrdered, "org.Hs.eg.db", ont="BP")
+head(enrichmentGo_bp, 20)
+```
+## KEGG
+
+Get kegg code for homo sapiens
+```{r}
+human <- search_kegg_organism('Homo sapiens', by='scientific_name')
+human <- human$kegg_code[1]
+```
+
+### KEGG pathway over-representation analysis
+```{r}
+kk <- enrichKEGG(
+  gene= geneIDs,
+  organism= human
+)
+head(kk, 15)
+```
+### KEGG pathway gene set enrichment analysis
+```{r}
+kkGSE <- gseKEGG(
+  gene=geneListOrdered,
+  organism=human
+)
+head(kkGSE, 15)
+```
+### KEGG module over-representation analysis
+
+```{r}
+mkk <- enrichMKEGG(gene = geneIDs,
+                   organism = 'hsa',
+                   pvalueCutoff = 1,
+                   qvalueCutoff = 1)
+print(length(mkk$ID))
+head(mkk)
+```
+### KEGG module gene set enrichment analysis
+```{r}
+gseMKK <- gseMKEGG(gene = geneListOrdered,
+                   organism = 'hsa')
+head(gseMKK) 
+```
+```{r}
+library("pathview")
+# hsa04110 <- pathview(gene.data=geneListOrdered, pathway.id="hsa04110", species=human) # cell cycle
+```
+## WikiPathways
+
+```{r}
+get_wp_data <- function(organism, output = "data.frame") {
+    read.gmt.wp('wikipathways-20231010-gmt-Homo_sapiens.gmt.txt', output = output)
+}
+
+prepare_WP_data <- function(organism) {
+    wp2gene <- get_wp_data(organism)
+    ##TERM2GENE
+    wpid2gene <- wp2gene %>% dplyr::select(.data$wpid, .data$gene) 
+    ##TERM2NAME
+    wpid2name <- wp2gene %>% dplyr::select(.data$wpid, .data$name) 
+    list(WPID2GENE = wpid2gene,
+         WPID2NAME = wpid2name)
+}
+
+# enrichWP(geneIDs, organism="Homo sapiens")
+wiki_pathway <- read.gmt.wp('wikipathways-20231010-gmt-Homo_sapiens.gmt.txt')
+
+enrichWP <- function(gene, organism, ...) {
+    wpdata <- prepare_WP_data(organism)
+    res <- enricher(gene,
+                    TERM2GENE = wpdata$WPID2GENE,
+                    TERM2NAME = wpdata$WPID2NAME,
+                    ...)
+    if (is.null(res)) return(res)
+
+    res@ontology <- "WikiPathways"
+    res@organism <- organism
+    res@keytype <-  "ENTREZID"
+
+    return(res)
+}
+
+wp_enrichment <- enrichWP(geneIDs, "Homo sapiens", pvalueCutoff = 0.05)
+head(wp_enrichment)
+```
+### WikiPathways gene set enrichment analysis
+```{r}
+gseWP <- function(geneList, organism, ...) {
+    wpdata <- prepare_WP_data(organism)
+    res <- GSEA(geneList,
+                TERM2GENE = wpdata$WPID2GENE,
+                TERM2NAME = wpdata$WPID2NAME,
+                ...)
+
+    if (is.null(res)) return(res)
+
+    res@setType <- "WikiPathways"
+    res@organism <- organism
+    res@keytype <-  "ENTREZID"
+
+    return(res)
+}
+gse_wikipathways <- gseWP(geneListOrdered, organism = "Homo sapiens")
+head(gse_wikipathways, 15)
+```
+## Reactome
+### Overrepresentation
+```{r}
+library(ReactomePA)
+x <- enrichPathway(gene=geneIDs, pvalueCutoff = 0.05, readable=TRUE)
+head(x)
+```
+
+### Gene set enrichment
+```{r}
+y <- gsePathway(geneListOrdered)
+print(length(y$ID))
+head(y,20)
+```
+
