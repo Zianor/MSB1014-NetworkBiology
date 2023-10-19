@@ -4,5 +4,7 @@ report/.texpadtmp/**
 **/GEO2R.GSE218012.results/**
 .idea/**
 **/.Rhistory
+**/.RData
+*.tmp
 scr/data/**
 *.cys
