@@ -4,20 +4,39 @@
 % General description of the methodology
 % Enough details to ensure reproducibility of results
 
-\subsection{Data and Analysis of Differentially Expressed Genes}
+\subsection{Analysis of Differentially Expressed Genes and Network Creation}\label{sec:methods-deg}
+% DEG
 \begin{itemize}
-	\item data from geo database
-	\item analysis with geo2r
-	\item abs(log2FoldChange) > 0.5, pValue <0.05
-	\item 908 differentially expressed genes
+	\item data accessible at NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020} 
+	\item analysis with DeSeq2 in R based on the analysis exported from GEO2R \cite{DESeq2} to identily up-regulated and down-regulated genes
+	\item $|\text{log2FoldChange}| > 0.5$, $\text{pValue} <0.05$, pValue adjusted with Benjamini and Hochberg False Discovery Rate
 \end{itemize}
 
-\subsection{Network creation}
+% Network creation
 \begin{itemize}
-	\item query differentially expressed genes from string db (confidence cut off 0.4)
-	\item String was able to query 828 of them
-	\item query eds related to other eds genes additionally: 21 nodes from DISEASE (TODO: refernce)
-	\item resulting network: 847 nodes and 6129 edges
-	\item visualization of whole network probably not useful
-	\item data about differential expression loaded, for EDS genes and differentially expressed genes
+	\item query differentially expressed genes from string db \cite{StringDB} (confidence cut off 0.4)
+	\item query eds genes related to other eds types additionally: 21 genes retrieved from Disease Ontology with Disease Ontology ID 13359 \cite{DO}, queried from string
+	\item load data about differential expression, for EDS genes and differentially expressed genes
+\end{itemize}
+
+\subsection{Enrichment analysis and clustering}
+\begin{itemize}
+	\item exploratory enrichment analysis on whole network
+	\item large network, thus cluster before to get better insights for specific parts
+	\item two different cluster methods used with different resulting cluster structure
+\end{itemize}
+\subsubsection{MCODE}
+\begin{itemize}
+	\item MCODE finds "densely connected regions in large protein-protein interaction networks that may represent molecular complexes" \cite{mcode}
+	\item results in smaller clusters
+	\item suited to analyse molecular function
+	\item do we see clusters with other molecular functions than expected
+	\item are genes clustered together with other eds genes
+	\item are clusters generelly mostly upregulated or downregulated
+\end{itemize}
+\subsubsection{Community Clustering}
+\begin{itemize}
+	\item small cluster not helpful for biological processes and pathways
+	\item therefore use second clustering method
+	\item community clustering with GLay, "more suitable for functional interpretation" \cite{GLay}
 \end{itemize}

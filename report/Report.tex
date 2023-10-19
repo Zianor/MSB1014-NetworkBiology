@@ -12,16 +12,16 @@
 % Remove page number from titlepage
 \renewcommand*{\titlepagestyle}{empty}
 
-\RedeclareSectionCommands[
-  beforeskip=.5\baselineskip,
-  afterskip=.3\baselineskip
-]{section, subsection, subsubsection}
+%\RedeclareSectionCommands[
+%  beforeskip=.5\baselineskip,
+%  afterskip=.3\baselineskip
+%]{section, subsection, subsubsection}
 
 \begin{document}
 \author{Cay Rahn - 6255648}
 \date{\today}
 \title{Investigating the molecular cause of hypermobile Ehlers-Danlos syndrome}
-\subtitle{MSB 1014 - Network Biology}
+\subtitle{\vspace{3cm}\Large{MSB 1014 - Network Biology}}
 
 \maketitle
 
@@ -37,9 +37,11 @@
 \input{doc/103-results}
 \input{doc/104-discussion}
 
-\bibliographystyle{vancouver.bst}
+
 % Quality of literature used (biological background / methodology / tools)
 % Number of references (>20)
 % References style (Vancouver)
+\clearpage
+\bibliographystyle{vancouver.bst}
 \bibliography{references.bib}
 \end{document}
