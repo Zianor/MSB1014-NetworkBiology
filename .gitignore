@@ -6,5 +6,5 @@ report/.texpadtmp/**
 **/.Rhistory
 **/.RData
 *.tmp
-scr/data/**
+src/data/**
 *.cys

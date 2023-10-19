@@ -133,7 +133,7 @@ geneListOrdered <- sort(geneListOrdered, decreasing=T)
 ```
 
 With this we can do gene set enrichment (still molecular function)
-TODO: does this make sense here? Because we already have a cluster, so overrepresentation should mean more than this?
+TODO: does this make sense here? Because we already have a cluster, so over-representation should mean more than this?
 ```{r}
 # for cluster 1, we have only upregulated genes, thats why std scoring does not work
 enrichmentGo <- gseGO(geneListOrdered, "org.Hs.eg.db", ont="MF", scoreType="pos")
