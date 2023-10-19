@@ -1,0 +1,63 @@
+---
+title: "EDS genes in the complete network"
+output: html_notebook
+---
+
+```{r}
+library(reshape2)
+library(ggplot2)
+```
+
+# Load node table of network
+```{r}
+nodes <- read.csv('./data/networks/DEG_with_EDS_nodes.csv')
+head(nodes,10)
+```
+
+# Get the EDS nodes
+```{r}
+eds_nodes = subset(nodes, nodes$knownEDS == "true")
+print(length(eds_nodes$knownEDS))
+```
+# Get overview about degree, centrality etc
+```{r}
+selected_columns = c("Degree", "Entrez.Gene", "Ensembl", "display.name", "ClosenessCentrality", "BetweennessCentrality", "ClusteringCoefficient", "TopologicalCoefficient", "NeighborhoodConnectivity", "X.log2FoldChange.", "X.padj.")
+eds_nodes_stats = subset(eds_nodes, select=selected_columns)
+head(eds_nodes_stats)
+```
+# Have a look at those general metrics
+```{r}
+metric_columns = c("Degree", "ClosenessCentrality", "BetweennessCentrality", "ClusteringCoefficient", "TopologicalCoefficient", "NeighborhoodConnectivity")
+for(col in metric_columns) {
+  cat(paste("Summary for",col,"\n"))
+  cat(capture.output(summary(nodes[,col])), sep="\n")
+  cat("\n")
+  cat("EDS genes\n")
+  cat(eds_nodes[, col])
+  cat("\n")
+  cat("---\n")
+}
+```
+
+
+```{r}
+metric_table_big_values <- subset(nodes, select=c("Degree", "NeighborhoodConnectivity", "knownEDS"))
+melted_big_values = melt(metric_table_big_values)
+plt <- ggplot(data = melted_big_values, aes(variable, value, fill= knownEDS))
+plt + geom_boxplot() + labs(x = "Metric", y = "values")
+```
+
+```{r}
+metric_table_small_values <- subset(nodes, select=c("ClosenessCentrality", "ClusteringCoefficient", "TopologicalCoefficient", "knownEDS"))
+melted_small_values = melt(metric_table_small_values)
+plt <- ggplot(data = melted_small_values, aes(variable, value, fill= knownEDS))
+plt + geom_boxplot() + labs(x = "Metric", y = "values")
+```
+```{r}
+metric_table_betweenness <- subset(nodes, select=c("BetweennessCentrality", "knownEDS"))
+melted_betweenness = melt(metric_table_betweenness)
+plt <- ggplot(data = melted_betweenness, aes(variable, value, fill= knownEDS))
+plt + geom_boxplot(outlier.shape = NA) + labs(x = "Metric", y = "values") + scale_y_continuous(limits=c(0,0.05))
+
+```
+
