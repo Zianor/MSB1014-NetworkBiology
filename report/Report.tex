@@ -1,30 +1,72 @@
-\documentclass[onecolumn, a4paper,11pt, headings=small, titlepage=true]{scrartcl}
+\documentclass[onecolumn, a4paper,10pt, headings=normal, titlepage=true]{scrartcl}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
 \usepackage{hyperref}
-\usepackage[left=1.7cm, right=1.7cm, top=2cm, bottom=2.3cm]{geometry}
+\usepackage{graphicx}
+\usepackage[left=2.7cm, right=2.7cm, top=2.5cm, bottom=1.9cm]{geometry}
 
 \usepackage{enumitem}
-\setlist[description]{leftmargin=\parindent}%, noitemsep
+\setlist[itemize]{leftmargin=\parindent}
+
+\usepackage{setspace}
+
+\renewcommand{\baselinestretch}{1.5}
 
 % Remove page number from titlepage
 \renewcommand*{\titlepagestyle}{empty}
 
-%\RedeclareSectionCommands[
-%  beforeskip=.5\baselineskip,
-%  afterskip=.3\baselineskip
-%]{section, subsection, subsubsection}
+\setlist[itemize]{leftmargin=\parindent, noitemsep}
+
+\usepackage{fontspec}
+\setmainfont{Arial}
+
+\RedeclareSectionCommands[
+  beforeskip=.5\baselineskip,
+  afterskip=.3\baselineskip
+]{section, subsection, subsubsection}
 
 \begin{document}
-\author{Cay Rahn - 6255648}
-\date{\today}
-\title{Investigating the molecular cause of hypermobile Ehlers-Danlos syndrome}
-\subtitle{\vspace{3cm}\Large{MSB 1014 - Network Biology}}
+\begin{titlepage}
+	\thispagestyle{empty}
 
-\maketitle
+	\begin{minipage}[t]{\textwidth}
+	
+	\Large{\uppercase{Project report}}
+	
+	\vspace{2cm}
+	
+	\rule{\textwidth}{1pt}
+	
+	\vspace{0.5cm}
+	
+	\textbf{\huge{Investigating the molecular cause of hypermobile Ehlers-Danlos syndrome}}
+	
+	\rule{\textwidth}{1pt}
+	
+	\vspace{7cm}
+	
+	\LARGE{\textbf{Cay Rahn}}
+	
+	\large{6255648}
 
+	\vspace{3cm}
+	
+	\large{
+	\noindent\begin{tabular}{@{}ll}
+		\textbf{Course}:& MSB1014 Network Biology\\
+		\textbf{Program}:& Master Systems Biology\\
+		\textbf{Faculty}:& FSE\\
+		\textbf{Academic Year}:& 2023/24
+	\end{tabular}
+	}
+	\end{minipage}
+	
+	\vspace{2cm}
+	\large{\textbf{Date:} \today}
+	
+\end{titlepage}
 \clearpage
 \pagenumbering{arabic}
 \setcounter{page}{1}
