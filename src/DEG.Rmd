@@ -124,8 +124,9 @@ relevantWithoutEnsembl
 ```{r}
 upregulated = subset(tT, select="Symbol", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold & log2FoldChange > 0)$Symbol
 downregulated = subset(tT, select="Symbol", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold & log2FoldChange < 0)$Symbol
-print(length(upregulated))
-print(length(downregulated))
+cat(paste("Upregulated:", length(upregulated)))
+cat("\n")
+cat(paste("Downregulated:", length(downregulated)))
 ```
 
 
