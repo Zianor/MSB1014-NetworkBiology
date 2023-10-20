@@ -14,22 +14,27 @@
 
 % Network creation
 \begin{itemize}
+	\item use Cytoscape to create network \cite{Cytoscape}
 	\item query differentially expressed genes from string db \cite{StringDB} (confidence cut off 0.4)
-	\item query eds genes related to other eds types additionally: 21 genes retrieved from Disease Ontology with Disease Ontology ID 13359 \cite{DO}, queried from string
-	\item load data about differential expression, for EDS genes and differentially expressed genes
+	\item query eds genes related to other eds types additionally: 21 genes retrieved from Disease Ontology with Disease Ontology ID 13359 \cite{DO}, queried from string, again with a medium confidence cut off of 0.4
+	\item load data about differential expression into network, for EDS genes and differentially expressed genes
 \end{itemize}
 
 \subsection{Enrichment analysis and clustering}
 \begin{itemize}
 	\item exploratory enrichment analysis on whole network
+	\item use R-package clusterProfiler \cite{Wu2021} for enrichment
 	\item large network, thus cluster before to get better insights for specific parts
 	\item two different cluster methods used with different resulting cluster structure
+	\item create subnetworks for clusters with more than 15 nodes [TODO: why this threshold? to focus on more relevant because many in MCODE between 10 and 15 nodes, for community clustering smaller ones probably found by MCODE]
 \end{itemize}
 \subsubsection{MCODE}
 \begin{itemize}
 	\item MCODE finds "densely connected regions in large protein-protein interaction networks that may represent molecular complexes" \cite{mcode}
 	\item results in smaller clusters
 	\item suited to analyse molecular function
+	\item use default parameters
+	\item analysis of molecular function with clusterProfiler with GO over-representation analysis
 	\item do we see clusters with other molecular functions than expected
 	\item are genes clustered together with other eds genes
 	\item are clusters generelly mostly upregulated or downregulated
