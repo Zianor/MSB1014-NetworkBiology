@@ -1,16 +1,18 @@
-\documentclass[onecolumn, a4paper,10pt, headings=normal, titlepage=true]{scrartcl}
+\documentclass[onecolumn, a4paper,10pt, headings=normal,titlepage=true, headsepline, footsepline]{scrartcl}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage[left=2.7cm, right=2.7cm, top=2.5cm, bottom=1.9cm]{geometry}
+\usepackage[left=2.7cm, right=2.7cm, top=2.5cm, bottom=2.5cm]{geometry}
 
 \usepackage{enumitem}
 \setlist[itemize]{leftmargin=\parindent}
 
 \usepackage{setspace}
+
+\usepackage{lastpage}
 
 \renewcommand{\baselinestretch}{1.5}
 
@@ -18,6 +20,12 @@
 \renewcommand*{\titlepagestyle}{empty}
 
 \setlist[itemize]{leftmargin=\parindent, noitemsep}
+
+\usepackage{scrlayer-scrpage}
+\setkomafont{pageheadfoot}{} % define font style for page head foot
+\clearpairofpagestyles % remove the defaults
+\lofoot{MSB1014 Network Biology (2023/24)}
+\ofoot{\thepage\ of \pageref{LastPage}}
 
 \usepackage{fontspec}
 \setmainfont{Arial}
@@ -64,7 +72,7 @@
 	\end{minipage}
 	
 	\vspace{2cm}
-	\large{\textbf{Date:} \today}
+	\large{\today}
 	
 \end{titlepage}
 \clearpage

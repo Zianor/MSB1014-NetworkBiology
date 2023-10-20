@@ -5,10 +5,10 @@
 \subsection{Differentially Expressed Genes and Network creation}
 \begin{itemize}
 	\item 908 differentially expressed genes with chosen thresholds section \ref{sec:methods-deg}
-	\item around half are upregulated, around half downregulated [TODO: get exact numbers]
-	\item String was able to query 828 of them [TODO: provide table of not queried in supplementary material or at least github?]
+	\item around half are upregulated, around half downregulated (Upregulated: 495, Downregulated: 413)
+	\item String was able to query 828 of them, using alternative ID/Query methods did not change this
 	\item after querying additional genes that are known to be related to other eds types: resulting network with 847 nodes and 6129 edges
-	\item position of known eds genes in network is mostly central (checked degree, clustering coefficient, betweenness centrality and closeness centrality)
+	\item position of known eds genes in network is on average more central (checked degree, clustering coefficient, betweenness centrality and closeness centrality)
 \end{itemize}
 
 \subsection{Enrichment analysis and clustering}
@@ -37,8 +37,9 @@
 
 \begin{itemize}
 	\item 6 clusters with more than 15 nodes
-	\item 3 very small (18, 29, 29 nodes), two medium sized (76 and 105 nodes) and one very large cluster (363 nodes)
+	\item 3 very small loosely connected clusters (18 nodes \& 17 connections, 29 nodes \& 32 connections, 29 nodes \& 29 connections), two medium sized highly interconnected (76 nodes \& 1000 conections and 105 nodes \& 2330 connections) and one very large cluster (363 nodes \& 1661 connections)
 	\item especially medium sized clusters highly interconnected
 	\item biggest one mix of up-regulated and down-regulated genes, contains all 21 genes known to cause other EDS types
 	\item both medium sized clusters mostly upregulated $\rightarrow$ interesting!
+	\item cluster with 18 nodes to small for meaningful enrichment analysis regarding processes
 \end{itemize}
