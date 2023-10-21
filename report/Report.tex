@@ -1,4 +1,4 @@
-\documentclass[onecolumn, a4paper,10pt, headings=normal,titlepage=true, headsepline, footsepline]{scrartcl}
+\documentclass[onecolumn, a4paper,10pt,titlepage=true,footsepline, noparindent, parskip=half]{scrartcl}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
@@ -14,7 +14,7 @@
 
 \usepackage{lastpage}
 
-\renewcommand{\baselinestretch}{1.5}
+\onehalfspacing
 
 % Remove page number from titlepage
 \renewcommand*{\titlepagestyle}{empty}
@@ -31,9 +31,11 @@
 \setmainfont{Arial}
 
 \RedeclareSectionCommands[
-  beforeskip=.5\baselineskip,
-  afterskip=.3\baselineskip
+  beforeskip=.75\baselineskip,
+  afterskip=.75\baselineskip
 ]{section, subsection, subsubsection}
+
+\parindent 0pt
 
 \begin{document}
 \begin{titlepage}

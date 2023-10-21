@@ -5,12 +5,7 @@
 % Enough details to ensure reproducibility of results
 
 \subsection{Analysis of Differentially Expressed Genes and Network Creation}\label{sec:methods-deg}
-% DEG
-\begin{itemize}
-	\item data accessible at NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020} 
-	\item analysis with DeSeq2 in R based on the analysis exported from GEO2R \cite{DESeq2} to identily up-regulated and down-regulated genes
-	\item $|\text{log2FoldChange}| > 0.5$, $\text{pValue} <0.05$, pValue adjusted with Benjamini and Hochberg False Discovery Rate
-\end{itemize}
+A dataset of gene expression profiles from dermal fibroblasts from patients with hEDS and healthy controls is used. It is available at the NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020}. The analysis is performed with the R-package DeSeq2 based on the analysis script exported from GEO2R to identify up-regulated and down-regulated genes \cite{DESeq2}. Genes with a log2-fold change $> \pm 0.5$ and a p-value $< 0.05$ after adjustment based on False-Discovery-Rate using the Benjamin-Hochberg procedure where considered. The cut-offs where chosen based on similar research \cite{Karimizadeh2019, Lim2019}.
 
 % Network creation
 \begin{itemize}
