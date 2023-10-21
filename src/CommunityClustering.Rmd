@@ -224,3 +224,61 @@ enrichKEGGForCluster(4)
 enrichKEGGForCluster(5)
 ```
 
+# WikiPathways
+```{r}
+get_wp_data <- function(organism, output = "data.frame") {
+    read.gmt.wp('wikipathways-20231010-gmt-Homo_sapiens.gmt.txt', output = output)
+}
+
+prepare_WP_data <- function(organism) {
+    wp2gene <- get_wp_data(organism)
+    ##TERM2GENE
+    wpid2gene <- wp2gene %>% dplyr::select(.data$wpid, .data$gene) 
+    ##TERM2NAME
+    wpid2name <- wp2gene %>% dplyr::select(.data$wpid, .data$name) 
+    list(WPID2GENE = wpid2gene,
+         WPID2NAME = wpid2name)
+}
+
+# enrichWP(geneIDs, organism="Homo sapiens")
+wiki_pathway <- read.gmt.wp('wikipathways-20231010-gmt-Homo_sapiens.gmt.txt')
+
+enrichWP <- function(gene, organism, ...) {
+    wpdata <- prepare_WP_data(organism)
+    res <- enricher(gene,
+                    TERM2GENE = wpdata$WPID2GENE,
+                    TERM2NAME = wpdata$WPID2NAME,
+                    ...)
+    if (is.null(res)) return(res)
+
+    res@ontology <- "WikiPathways"
+    res@organism <- organism
+    res@keytype <-  "ENTREZID"
+
+    return(res)
+}
+```
+
+```{r}
+enrichWPForCluster <- function(i) {
+  tableCluster <- read.csv(paste("data/networks/glay/glay_cluster", i,"_nodes.txt", sep=""), header=TRUE)
+  wp <- enrichWP(
+    gene= tableCluster$`Entrez.Gene`,
+    organism= human,
+  )
+  head(wp, 15)
+}
+```
+
+```{r}
+enrichWPForCluster(1)
+```
+
+```{r}
+enrichWPForCluster(4)
+```
+
+```{r}
+enrichWPForCluster(5)
+```
+
