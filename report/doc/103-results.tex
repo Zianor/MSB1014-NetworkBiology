@@ -23,13 +23,16 @@
 	\item the eds genes are all below the threshold of $|\text{log2FoldChange}| > 0.5$, 1 of them is 1 of the two downregulated genes
 	\item quite interesting to see genes closely related to other eds genes, COL21A1 is also strongly upregulated ($\text{log2FoldChange} > 2$)
 	\item all known EDS genes with ADAMTS2 as exception have a high Closeness Centrality
-	\item regarding the enrichment of this cluster: not surprising to see extracellular
+	\item regarding the enrichment of this cluster: not surprising to see extracellular matrix in two GO-Terms when testing for overrepresentation of molecular functions
+	\item first go term: GO:0005201 - The action of a molecule that contributes to the structural integrity of the extracellular matrix. overall 13 of the 16 genes in this GO-Term, 6 are known eds genes, the other 6 differentially expressed (COL10A1, COL15A1, PCOLCE, COL5A3, COL18A1, COL21A1, COL27A1)
+	\item second go term: GO:0030020 - A constituent of the extracellular matrix that enables the matrix to resist longitudinal stress, subtype of the first. Same EDS genes and same genes as in first term except PCOLCE, PCOLE is also the only downregulated gene [TODO: interprete]
 \end{itemize}
 
 \begin{figure}[htb!]
 	\centering
+	\caption*{\textbf{MCODE cluster 3}}
 	\includegraphics[width=0.6\textwidth]{fig/MCODE-cluster3.png}
-	\caption{MCODE cluster 3 [TODO: add legend for shape and colour]}
+	\caption[MCODE cluster 3]{\centering The MCODE cluster containing many genes known to cause other types of EDS. [TODO: add legend for shape and colour]}
 	\label{fig:mcode3}
 \end{figure}
 

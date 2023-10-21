@@ -5,35 +5,23 @@
 % Enough details to ensure reproducibility of results
 
 \subsection{Analysis of Differentially Expressed Genes and Network Creation}\label{sec:methods-deg}
-A dataset of gene expression profiles from dermal fibroblasts from patients with hEDS and healthy controls is used. It is available at the NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020}. The analysis is performed with the R-package DeSeq2 based on the analysis script exported from GEO2R to identify up-regulated and down-regulated genes \cite{DESeq2}. Genes with a log2-fold change $> \pm 0.5$ and a p-value $< 0.05$ after adjustment based on False-Discovery-Rate using the Benjamin-Hochberg procedure where considered. The cut-offs where chosen based on similar research \cite{Karimizadeh2019, Lim2019}.
+A dataset of gene expression profiles from dermal fibroblasts from patients with hEDS and healthy controls is used. It is available at the NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020}. The analysis is performed with the R-package DeSeq2 based on the analysis script exported from GEO2R to identify up-regulated and down-regulated genes \cite{DESeq2}. Genes with a log2-fold change $> \pm 0.5$ and a p-value $< 0.05$ after adjustment based on False-Discovery-Rate using the Benjamin-Hochberg procedure were considered. The cut-offs were chosen based on similar research \cite{Karimizadeh2019, Lim2019}.
 
 % Network creation
-\begin{itemize}
-	\item use Cytoscape to create network \cite{Cytoscape}
-	\item query differentially expressed genes from string db \cite{StringDB} (confidence cut off 0.4)
-	\item query eds genes related to other eds types additionally: 21 genes retrieved from Disease Ontology with Disease Ontology ID 13359 \cite{DO}, queried from string, again with a medium confidence cut off of 0.4
-	\item load data about differential expression into network, for EDS genes and differentially expressed genes
-\end{itemize}
+The Protein-protein interaction (PPI) network is then created in Cytoscape \cite{Cytoscape} by querying the before identified differentially expressed genes from the STRING database with an interaction score $> 0.4$ which reflects a medium confidence \cite{StringDB}. Since hEDS belongs to the family of Ehlers-Danlos syndroms its molecular cause is most likely closely related to other EDS types. The PPI network of the differentially expressed genes is therefore expanded by additionally querying genes related to other EDS types. The genes are retrieved from Disease Ontolgy with Disease Ontology ID 13359 \cite{DO} and similarly queried from STRING with a medium confidence threshold as well. The resulting network is annotated with the data obtained by the data from the analysis of the differential expression of the genes.
 
 \subsection{Enrichment analysis and clustering}
 \begin{itemize}
-	\item exploratory enrichment analysis on whole network
-	\item use R-package clusterProfiler \cite{Wu2021} for enrichment
+	\item exploratory enrichment analysis to gain insights about affected pathways, biological processes, molecular function and cellular components
+	\item use R-package clusterProfiler \cite{Wu2021} for GO-enrichment \cite{Ashburner2000,Consortium2023}
 	\item large network, thus cluster before to get better insights for specific parts
 	\item two different cluster methods used with different resulting cluster structure
 	\item create subnetworks for clusters with more than 15 nodes [TODO: why this threshold? to focus on more relevant because many in MCODE between 10 and 15 nodes, for community clustering smaller ones probably found by MCODE]
 \end{itemize}
 \subsubsection{MCODE}
-\begin{itemize}
-	\item MCODE finds "densely connected regions in large protein-protein interaction networks that may represent molecular complexes" \cite{mcode}
-	\item results in smaller clusters
-	\item suited to analyse molecular function
-	\item use default parameters
-	\item analysis of molecular function with clusterProfiler with GO over-representation analysis
-	\item do we see clusters with other molecular functions than expected
-	\item are genes clustered together with other eds genes
-	\item are clusters generelly mostly upregulated or downregulated
-\end{itemize}
+MCODE is a clustering algorithm designed to find highly-connected regions in larger PPI networks \cite{mcode}. Such regions might represent molecular complexes which makes MCODE a suitable algorithm to analyes the molecular function of the resulting clusters that are mostly small because of MCODEs search for dense regions. MCODE was applied in Cytoscape with the clusterMaker2 app using the default parameters \cite{clusterMaker2}.
+
+On the resulting clusters, GO-enrichment is performed to find over-represented molecular functions that might be involved in causing hEDS. Addititonally, it is investigated whether genes are clustered together with genes known to cause other EDS types and whether the resulting clusters consist of upregulated or downregulated genes or a combination of both.
 \subsubsection{Community Clustering}
 \begin{itemize}
 	\item small cluster not helpful for biological processes and pathways

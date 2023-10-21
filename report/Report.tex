@@ -1,11 +1,12 @@
-\documentclass[onecolumn, a4paper,10pt,titlepage=true,footsepline, noparindent, parskip=half]{scrartcl}
-\usepackage[utf8]{inputenc}
+\documentclass[onecolumn, a4paper,10pt,titlepage=true,parskip=half]{scrartcl}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{caption}
 \usepackage[left=2.7cm, right=2.7cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{xcolor}
 
 \usepackage{enumitem}
 \setlist[itemize]{leftmargin=\parindent}
@@ -24,8 +25,8 @@
 \usepackage{scrlayer-scrpage}
 \setkomafont{pageheadfoot}{} % define font style for page head foot
 \clearpairofpagestyles % remove the defaults
-\lofoot{MSB1014 Network Biology (2023/24)}
-\ofoot{\thepage\ of \pageref{LastPage}}
+\lofoot{\color{gray}MSB1014 Network Biology (2023/24)}
+\ofoot{\color{gray}\thepage\ of \pageref{LastPage}}
 
 \usepackage{fontspec}
 \setmainfont{Arial}
