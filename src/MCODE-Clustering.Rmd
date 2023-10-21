@@ -25,6 +25,10 @@ print(networkSuid)
 ```{r}
 commandsHelp("help cluster")
 ```
+```{r}
+edsGeneSymbols = c("ADAMTS2", "AEBP1", "B3GALT6", "B4GALT7", "C1R", "C1S", "CCBE1", "CHST14", "COL12A1", "COL1A1", "COL1A2", "COL3A1","COL5A1", "COL5A2", "DSE", "FKBP14", "PLOD1", "PRDM5", "SLC39A13", "SLC6A5", "TNXB", "ZNF469")
+```
+
 
 ```{r}
 # minimum number of nodes to create a new network out of the cluster
@@ -95,8 +99,9 @@ plotClusterEnrichment <- function(i) {
       readable = TRUE
       )
   resCluster.df <- as.data.frame(resCluster)
-  head(resCluster.df)
-  barplot(resCluster, showCategory = 15, title = paste("Molecular Function MCODE cluster ",i, sep=""), font.size=9)
+  cat(capture.output(head(resCluster), sep="\n"))
+  barplot(resCluster, showCategory = 5, title = paste("Molecular Function MCODE cluster ",i, sep=""), font.size=10)
+  return(resCluster)
 }
 ```
 
@@ -110,8 +115,57 @@ plotClusterEnrichment(2)
 ```
 
 ```{r}
-plotClusterEnrichment(3)
+resCluster3 <- plotClusterEnrichment(3)
 ```
+Look if only the known EDS genes are in the extracellular matrix molecular function or whether the other genes are there as well (or rather) which ones
+
+##### First for GO:0030020 - extracellular matrix structural constituent conferring tensile strength
+```{r}
+extracellular_tensile_strength_genes <- resCluster3@geneSets$`GO:0030020`
+extracellular_tensile_strength_nonEDS <- c()
+extracellular_tensile_strength_EDS <- c()
+for(gene in extracellular_tensile_strength_genes) {
+  if(!(gene %in% edsGeneSymbols) & (gene %in% resCluster3@gene)) {
+    extracellular_tensile_strength_nonEDS <- c(extracellular_tensile_strength_nonEDS, gene)
+  }
+  else {
+    if(gene %in% edsGeneSymbols) {
+      extracellular_tensile_strength_EDS <- c(extracellular_tensile_strength_EDS, gene)
+    }
+  }
+}
+edsGenesString <- paste(extracellular_tensile_strength_EDS, collapse = ", ")
+nonEDSGenesString <- paste(extracellular_tensile_strength_nonEDS, collapse=", ")
+cat(paste("EDS genes in extracellular matrix structural constituent conferring tensile strength", edsGenesString))
+cat("\n")
+cat(paste("In total", length(extracellular_tensile_strength_EDS), "EDS genes of overall 12"))
+cat("\n")
+cat(paste("Non-EDS genes: ", nonEDSGenesString))
+```
+##### Then for GO:0005201 - extracellular matrix structural constituent
+```{r}
+extracellular_structure_genes <- resCluster3@geneSets$`GO:0005201`
+extracellular_structure_nonEDS <- c()
+extracellular_structure_EDS <- c()
+for(gene in extracellular_structure_genes) {
+  if(!(gene %in% edsGeneSymbols) & (gene %in% resCluster3@gene)) {
+    extracellular_structure_nonEDS <- c(extracellular_structure_nonEDS, gene)
+  }
+  else {
+    if(gene %in% edsGeneSymbols) {
+      extracellular_structure_EDS <- c(extracellular_structure_EDS, gene)
+    }
+  }
+}
+edsGenesString <- paste(extracellular_structure_EDS, collapse = ", ")
+nonEDSGenesString <- paste(extracellular_structure_nonEDS, collapse=", ")
+cat(paste("EDS genes in extracellular matrix structural constituent", edsGenesString))
+cat("\n")
+cat(paste("In total", length(extracellular_structure_EDS), "EDS genes of overall 12"))
+cat("\n")
+cat(paste("Non-EDS genes: ", nonEDSGenesString))
+```
+
 
 We do not only want over-representation analysis, but to include the order from the log fold change. For this, I need the original list of differentially expressed genes again.
 
