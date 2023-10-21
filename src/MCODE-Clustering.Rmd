@@ -100,8 +100,8 @@ plotClusterEnrichment <- function(i) {
       )
   resCluster.df <- as.data.frame(resCluster)
   cat(capture.output(head(resCluster), sep="\n"))
-  barplot(resCluster, showCategory = 5, title = paste("Molecular Function MCODE cluster ",i, sep=""), font.size=10)
-  return(resCluster)
+  barplot(resCluster, showCategory = 8, title = paste("Molecular Function MCODE cluster ",i, sep=""), font.size=10)
+  #return(resCluster)
 }
 ```
 
@@ -125,11 +125,11 @@ extracellular_tensile_strength_genes <- resCluster3@geneSets$`GO:0030020`
 extracellular_tensile_strength_nonEDS <- c()
 extracellular_tensile_strength_EDS <- c()
 for(gene in extracellular_tensile_strength_genes) {
-  if(!(gene %in% edsGeneSymbols) & (gene %in% resCluster3@gene)) {
+  if((!(gene %in% edsGeneSymbols)) & (gene %in% resCluster3@gene)) {
     extracellular_tensile_strength_nonEDS <- c(extracellular_tensile_strength_nonEDS, gene)
   }
   else {
-    if(gene %in% edsGeneSymbols) {
+    if(gene %in% edsGeneSymbols & (gene %in% resCluster3@gene)) {
       extracellular_tensile_strength_EDS <- c(extracellular_tensile_strength_EDS, gene)
     }
   }
@@ -138,7 +138,7 @@ edsGenesString <- paste(extracellular_tensile_strength_EDS, collapse = ", ")
 nonEDSGenesString <- paste(extracellular_tensile_strength_nonEDS, collapse=", ")
 cat(paste("EDS genes in extracellular matrix structural constituent conferring tensile strength", edsGenesString))
 cat("\n")
-cat(paste("In total", length(extracellular_tensile_strength_EDS), "EDS genes of overall 12"))
+cat(paste("In total", length(extracellular_tensile_strength_EDS), "EDS genes of overall", length(extracellular_tensile_strength_EDS)+length(extracellular_tensile_strength_nonEDS)))
 cat("\n")
 cat(paste("Non-EDS genes: ", nonEDSGenesString))
 ```
@@ -148,11 +148,11 @@ extracellular_structure_genes <- resCluster3@geneSets$`GO:0005201`
 extracellular_structure_nonEDS <- c()
 extracellular_structure_EDS <- c()
 for(gene in extracellular_structure_genes) {
-  if(!(gene %in% edsGeneSymbols) & (gene %in% resCluster3@gene)) {
+  if((!(gene %in% edsGeneSymbols)) & (gene %in% resCluster3@gene)) {
     extracellular_structure_nonEDS <- c(extracellular_structure_nonEDS, gene)
   }
   else {
-    if(gene %in% edsGeneSymbols) {
+    if(gene %in% edsGeneSymbols & (gene %in% resCluster3@gene)) {
       extracellular_structure_EDS <- c(extracellular_structure_EDS, gene)
     }
   }
@@ -161,37 +161,9 @@ edsGenesString <- paste(extracellular_structure_EDS, collapse = ", ")
 nonEDSGenesString <- paste(extracellular_structure_nonEDS, collapse=", ")
 cat(paste("EDS genes in extracellular matrix structural constituent", edsGenesString))
 cat("\n")
-cat(paste("In total", length(extracellular_structure_EDS), "EDS genes of overall 12"))
+cat(paste("In total", length(extracellular_structure_EDS), "EDS genes of overall", length(extracellular_structure_EDS)+length(extracellular_structure_nonEDS)))
 cat("\n")
 cat(paste("Non-EDS genes: ", nonEDSGenesString))
-```
-
-
-We do not only want over-representation analysis, but to include the order from the log fold change. For this, I need the original list of differentially expressed genes again.
-
-
-```{r}
-i <- 1
-# load the gene symbols
-tableCluster <- read.csv(paste("data/networks/MCODE/mcode_cluster_", i,"_nodes.txt", sep=""), header=TRUE)
-deg_df <- read.csv("data/deg.txt", header=TRUE)
-log2FCThreshold <- 0.5
-pValueThreshold <- 0.05
-deg_cluster <- subset(deg_df, GeneID %in% tableCluster$`Entrez.Gene`)
-print(length(deg_cluster$GeneID))
-# create the ordered list we need
-geneList <- subset(deg_cluster, select=c("GeneID", "log2FoldChange"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)
-foldChange <- geneList$log2FoldChange
-geneListOrdered <- setNames(foldChange, as.character(geneList$GeneID))
-geneListOrdered <- sort(geneListOrdered, decreasing=T)
-```
-
-With this we can do gene set enrichment (still molecular function)
-TODO: does this make sense here? Because we already have a cluster, so over-representation should mean more than this?
-```{r}
-# for cluster 1, we have only upregulated genes, thats why std scoring does not work
-enrichmentGo <- gseGO(geneListOrdered, "org.Hs.eg.db", ont="MF", scoreType="pos")
-head(enrichmentGo, 20)
 ```
 
 
