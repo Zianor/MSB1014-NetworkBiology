@@ -1,0 +1,101 @@
+---
+title: "Heat Diffusion"
+output: html_notebook
+---
+
+
+```{r}
+df = read.csv("deg.txt", header=TRUE)
+```
+
+```{r}
+BiocManager::install(c("RCy3"))
+```
+
+```{r}
+library(RCy3)
+```
+
+```{r}
+clearSelection()
+copyVisualStyle("default", "diffusion")
+setVisualStyle("diffusion")
+deleteStyleMapping("diffusion","NODE_FILL_COLOR")
+```
+# Select network
+```{r}
+networkSuid <- getNetworkSuid()
+print(networkSuid)
+```
+
+
+# select start nodes
+```{r}
+edsGeneSymbols = c("ADAMTS2", "AEBP1", "B3GALT6", "B4GALT7", "C1R", "C1S", "CCBE1", "CHST14", "COL12A1", "COL1A1", "COL1A2", "COL3A1","COL5A1", "COL5A2", "DSE", "FKBP14", "PLOD1", "PRDM5", "SLC39A13", "SLC6A5", "TNXB", "ZNF469")
+
+knownEDS.table <- getTableColumns('node','knownEDS', network=networkSuid)
+edsNodes <- row.names(knownEDS.table)[knownEDS.table$knownEDS == TRUE]
+cat(paste(edsNodes, collapse=", "))
+cat(paste("\n", length(edsNodes), "nodes related to other EDS types"))
+selectNodes(edsNodes)
+setNodeBorderColorBypass(edsNodes,"#FF55AA")
+setNodeBorderWidthBypass(edsNodes,5)
+```
+
+# Diffusion
+```{r}
+diffusionBasic()
+clearSelection()
+setNodeColorMapping("diffusion_output_heat", c(0,0.5), c("#FFFFFF", "#006699"), style="diffusion")
+```
+# select nodes with highest ranks and look at diffuasion heat before to get a feeling for the amount of hot nodes
+```{r}
+networkSuidDiffusion <- getNetworkSuid()
+cat(networkSuidDiffusion)
+nodesAfterDiffusion <- getTableColumns('node', c('knownEDS', "display name", "Entrez Gene", "diffusion_output_heat", "diffusion_input", "diffusion_output_rank"), network=networkSuidDiffusion)
+head(nodesAfterDiffusion[order(nodesAfterDiffusion$diffusion_output_rank),])
+```
+```{r}
+hist(nodesAfterDiffusion$diffusion_output_heat, breaks = "sturges")
+```
+```{r}
+cat(length(subset(nodesAfterDiffusion, diffusion_output_heat > 0.3)$diffusion_output_rank))
+cat("\n")
+cat(length(subset(nodesAfterDiffusion, diffusion_output_heat > 0.2)$diffusion_output_rank))
+cat("\n")
+cat(length(subset(nodesAfterDiffusion, diffusion_output_heat > 0.1)$diffusion_output_rank))
+```
+```{r}
+subset_without_eds <- subset(nodesAfterDiffusion, knownEDS == FALSE & diffusion_output_heat > 0.1)
+hotGenes <- subset_without_eds[order(subset_without_eds$diffusion_output_rank),]
+cat(paste("Amount of hot genes", length(hotGenes$diffusion_output_rank)))
+head(hotGenes, 15)
+```
+# Enrichment on hot genes (compare to mcode cluster 3 as well)
+
+```{r}
+plotMFEnrichment <- function(genes) {
+  res <- clusterProfiler::enrichGO(
+      gene = genes,
+      OrgDb = org.Hs.eg.db,
+      ont = "MF",
+      pAdjustMethod ="BH",
+      pvalueCutoff = 0.05,
+      qvalueCutoff = 0.05,
+      readable = TRUE
+      )
+  resr.df <- as.data.frame(res)
+  cat(capture.output(head(res), sep="\n"))
+  barplot(res, showCategory = 8, title = paste("Molecular Function", sep=""), font.size=10)
+  #return(resCluster)
+}
+```
+
+```{r}
+plotMFEnrichment(hotGenes$`Entrez Gene`)
+```
+
+```{r}
+hotGenes$`Entrez Gene`
+```
+
