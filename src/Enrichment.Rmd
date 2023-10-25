@@ -5,14 +5,20 @@ output: html_notebook
 ---
 
 ```{r}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
 library(BiocManager)
 BiocManager::install("clusterProfiler")
+BiocManager::install("org.Hs.eg.db")
 BiocManager::install("pathview")
 BiocManager::install("ReactomePA")
+BiocManager::install("KEGGgraph")
 ```
 
 ```{r}
 library("clusterProfiler")
+library("pathview")
+library("ReactomePA")
 ```
 
 ```{r}
@@ -22,7 +28,7 @@ df
 ```{r}
 pValueThreshold <- 0.05
 log2FCThreshold <- 0.5
-geneList <- subset(tT, select=c("GeneID", "log2FoldChange"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)
+geneList <- subset(df, select=c("GeneID", "log2FoldChange"), padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)
 foldChange <- geneList$log2FoldChange
 geneListOrdered <- setNames(foldChange, as.character(geneList$GeneID))
 geneListOrdered <- sort(geneListOrdered, decreasing=T)
@@ -31,7 +37,7 @@ geneListOrdered <- sort(geneListOrdered, decreasing=T)
 ### Molecular function
 #### Go classification
 ```{r}
-geneIDs <- as.character(subset(tT, select="GeneID", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)$GeneID)
+geneIDs <- as.character(subset(df, select="GeneID", padj<pValueThreshold & abs(log2FoldChange) >= log2FCThreshold)$GeneID)
 ggo_mf <- groupGO(
   gene=geneIDs,
   "org.Hs.eg.db",
@@ -87,6 +93,10 @@ cat(paste(geneSymbols_ego_cc$SYMBOL, collapse=", "))
 barplot(ego_cc, showCategory = 15, title = "Cellular Component", font.size = 8)
 ```
 ```{r}
+dotplot(ego_cc, showCategory = 15, title = "Differentially expressed genes - Cellular Component", font.size = 8)
+```
+
+```{r}
 goplot(ego_cc)
 ```
 
@@ -115,7 +125,11 @@ ego_bp <- enrichGO(gene=geneIDs, "org.Hs.eg.db", ont = "BP", readable = T, pvalu
 head(ego_bp,20)
 ```
 ```{r}
-barplot(ego_bp, showCategory = 15, title = "Biological Process", font.size = 8)
+barplot(ego_bp, showCategory = 10, title = "Biological Process", font.size = 9)
+```
+
+```{r}
+dotplot(ego_bp, showCategory = 15, title = "Biological Process", font.size = 8)
 ```
 
 ```{r}
@@ -155,9 +169,7 @@ head(kkGSE, 15)
 
 ```{r}
 mkk <- enrichMKEGG(gene = geneIDs,
-                   organism = 'hsa',
-                   pvalueCutoff = 1,
-                   qvalueCutoff = 1)
+                   organism = 'hsa')
 print(length(mkk$ID))
 head(mkk)
 ```
@@ -168,7 +180,7 @@ gseMKK <- gseMKEGG(gene = geneListOrdered,
 head(gseMKK) 
 ```
 ```{r}
-library("pathview")
+
 # hsa04110 <- pathview(gene.data=geneListOrdered, pathway.id="hsa04110", species=human) # cell cycle
 ```
 ## WikiPathways
@@ -232,7 +244,6 @@ head(gse_wikipathways, 15)
 ## Reactome
 ### Overrepresentation
 ```{r}
-library(ReactomePA)
 x <- enrichPathway(gene=geneIDs, pvalueCutoff = 0.05, readable=TRUE)
 head(x)
 ```
