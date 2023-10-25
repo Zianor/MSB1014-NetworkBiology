@@ -3,31 +3,23 @@
 % Methodology aligns with research question (appropriate resources/methods used)
 % General description of the methodology
 % Enough details to ensure the reproducibility of results
-To answer the research question, the following steps will be performed:
+The following structured approach will be pursued to answer the research question:
 
-\subsection{Analysis of Differentially Expressed Genes and Network Creation}\label{sec:methods-deg}
-A dataset of gene expression profiles from dermal fibroblasts from patients with hEDS and healthy controls is used. It is available at the NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020}. The analysis is performed with the R-package DeSeq2 based on the analysis script exported from GEO2R to identify up-regulated and down-regulated genes \cite{DESeq2}. Genes with a log2-fold change $> \pm 0.5$ and a p-value $< 0.05$ after adjustment based on False-Discovery-Rate using the Benjamin-Hochberg procedure were considered. The cut-offs were chosen based on similar research \cite{Karimizadeh2019, Lim2019}.
+\begin{description}[leftmargin=5pt]
+	\item [Analysis of Differentially Expressed Genes (DEGs).]\label{sec:methods-deg}A dataset of gene expression profiles from dermal fibroblasts from patients with hEDS and healthy controls is used, available at the NCBI GEO database with the accession number GSE218012 \cite{Ritelli2020}. The analysis is performed with the R-packages \texttt{DeSeq2} and \texttt{limma} based on the analysis from GEO2R to identify up-regulated and down-regulated genes \cite{DESeq2, limma}. Genes with a log2-fold change $> \pm 0.5$ and a p-value $< 0.05$ after adjustment based on False-Discovery-Rate using the Benjamin-Hochberg procedure were considered. The cut-offs were chosen based on similar research \cite{Karimizadeh2019, Lim2019}.
 
-% Network creation
-The Protein-protein interaction (PPI) network is then created in Cytoscape \cite{Cytoscape} by querying the before identified differentially expressed genes from the STRING database with an interaction score $> 0.4$ which reflects medium confidence \cite{StringDB}. Since hEDS belongs to the family of Ehlers-Danlos syndromes its molecular cause is most likely closely related to other EDS types. The PPI network of the differentially expressed genes is therefore expanded by additionally querying genes related to other EDS types. The genes are retrieved from Disease ontology with Disease Ontology ID 13359 \cite{DO} and similarly queried from STRING with a medium confidence threshold as well. The resulting network is annotated with the data from the analysis of the differential expression of the genes.
+	\item[Network Creation.] The Protein-protein interaction (PPI) network is created in Cytoscape \cite{Cytoscape} by querying the before-identified DEGs from the STRING database with an interaction score $> 0.4$, which reflects medium confidence \cite{StringDB}. Since hEDS belongs to the family of Ehlers-Danlos syndromes, its molecular cause is most likely closely related to other EDS types. The PPI network of the DEGs is therefore expanded by additionally querying genes related to other EDS types. The genes are retrieved from Disease ontology (Disease Ontology ID 13359) \cite{DO} and queried similarly from STRING. The resulting network is annotated with the differential expression data of the genes.
+	
+	\item[Gene Ontology and Clustering.]To gain insight into affected biological processes and molecular functions affected by differentially expressed genes, GeneOntology (GO) enrichment is performed by using the R-package \texttt{clusterProfiler} \cite{Ashburner2000,Consortium2023, Wu2021}. Generally, results with $p < 0.05$ are considered as significant. The created network is clustered to attain more detailed insights into specific part. Two different algorithms, resulting in different cluster structures, are used: MCODE to analyse the molecular function and Community clustering to analyse biological processes and pathways. Only clusters of more than 15 genes are included in the analysis to ensure relevance and keep the analysis feasible in the project's scope. Further analysis on the resulting clusters includes investigating whether genes are clustered together with genes known to cause other EDS types and whether the resulting clusters consist of up-regulated or down-regulated genes or a combination of both.
+	
+	\begin{description}[leftmargin=5pt]
+		\item[MCODE]MCODE is a clustering algorithm designed to find highly connected regions in PPI networks that might represent molecular complexes \cite{mcode}. The mostly small and dense resulting clusters are suitable to analyse their molcular function. MCODE was applied in Cytoscape with the clusterMaker2 app using the default parameters \cite{clusterMaker2}.
+		
+		\item[Community Clustering]To analyse the biological processes and pathways involved in the DEGs, larger clusters are required. GLay, a community clustering algorithm, was designed to be used for a functional interpretation of clusters in networks \cite{GLay}. Analogous to the MCODE, clustering was performed with clusterMaker2 and Cytoscape using the default parameters \cite{Cytoscape, clusterMaker2}.
+		
+		Heat Diffusion is applied to identify genes closely connected to genes causing other EDS types, starting with the EDS nodes using Cytoscape functionality \cite{heatDiffusion}. [TODO: heat parameter]
+	\end{description}
+\end{description}
+
 
 %[TODO: position of eds genes in network - why]
-
-\subsection{Gene Ontology and Clustering}
-
-To gain insight about affected [TODO: by what] biological processes, molecular functions and pathways, the R-package clusterProfiler \cite{Wu2021} is used for GeneOntology (GO) enrichment \cite{Ashburner2000,Consortium2023}.
-\begin{itemize}
-	\item large network, thus cluster before to get better insights for specific parts
-	\item two different cluster methods used with a different resulting cluster structure
-	\item create subnetworks for clusters with more than 15 nodes [TODO: why this threshold? to focus on more relevant because many in MCODE between 10 and 15 nodes, for community clustering smaller ones probably found by MCODE]
-\end{itemize}
-
-\subsubsection*{MCODE}
-MCODE is a clustering algorithm designed to find highly connected regions in larger PPI networks \cite{mcode}. Such regions might represent molecular complexes which makes MCODE a suitable algorithm to analyse the molecular function of the resulting clusters that are mostly small because of MCODE's search for dense regions. MCODE was applied in Cytoscape with the clusterMaker2 app using the default parameters \cite{clusterMaker2}.
-
-On the resulting clusters, GO-enrichment is performed to find over-represented molecular functions that might be involved in causing hEDS, considering results with $p < 0.05$ as significant. Additionally, it is investigated whether genes are clustered together with genes known to cause other EDS types and whether the resulting clusters consist of upregulated or downregulated genes or a combination of both.
-
-\subsubsection*{Community Clustering}
-To analyse the biological processes and pathways involved in the differential expressed genes, larger clusters are required. GLay, a community clustering algorithm was designed to be used for a functional interpretation of clusters in networks \cite{GLay}. Analogous to the MCODE, clustering was performed with clusterMaker2 and Cytoscape using the default parameters \cite{Cytoscape, clusterMaker2}.
-
-The GO enrichment on the resulting clusters focuses on biological processes instead of molecular function. [TODO: pathway enrichment]
