@@ -1,6 +1,8 @@
 ---
 title: "MCODE Clustering"
 output: html_notebook
+fig_width: 4 
+fig_height: 3
 ---
 
 ```{r}
@@ -12,8 +14,10 @@ library(RCy3)
 library(igraph)
 library(clusterProfiler)
 library(org.Hs.eg.db)
+library(ggplot2)
+```
 
-
+```{r}
 cytoscapePing ()
 ```
 
@@ -86,7 +90,7 @@ for(i in 1:num) {
 ```
 
 ```{r}
-plotClusterEnrichment <- function(i) {
+plotClusterEnrichment <- function(i, dot=FALSE, returnResults=FALSE) {
   tableCluster <- read.csv(paste("data/networks/MCODE/mcode_cluster_", i,"_nodes.txt", sep=""), header=TRUE)
   resCluster <- clusterProfiler::enrichGO(
       gene = tableCluster$`display.name`,
@@ -100,8 +104,14 @@ plotClusterEnrichment <- function(i) {
       )
   resCluster.df <- as.data.frame(resCluster)
   cat(capture.output(head(resCluster), sep="\n"))
-  barplot(resCluster, showCategory = 8, title = paste("Molecular Function MCODE cluster ",i, sep=""), font.size=10)
-  #return(resCluster)
+  if(dot) {
+    return(dotplot(resCluster, showCategory = 8, title = paste("MCODE cluster ",i, sep=""), font.size=11))
+  } else {
+    return(barplot(resCluster, showCategory = 8, title = paste("MCODE cluster ",i, sep=""), font.size=11))
+  }
+  if(returnResults){
+    return(resCluster)
+  }
 }
 ```
 
@@ -109,18 +119,30 @@ plotClusterEnrichment <- function(i) {
 ```{r}
 plotClusterEnrichment(1)
 ```
+```{r, fig.dpi=300, fig.height=4, fig.width=5}
+plotClusterEnrichment(1, TRUE, FALSE)
+```
+
 
 ```{r}
 plotClusterEnrichment(2)
 ```
+```{r, fig.dpi=300, fig.height=4, fig.width=5}
+plotClusterEnrichment(2, TRUE, FALSE)
+```
 
 ```{r}
-resCluster3 <- plotClusterEnrichment(3)
+plotClusterEnrichment(3)
+```
+
+```{r}
+plotClusterEnrichment(3, TRUE)
 ```
 Look if only the known EDS genes are in the extracellular matrix molecular function or whether the other genes are there as well (or rather) which ones
 
 ##### First for GO:0030020 - extracellular matrix structural constituent conferring tensile strength
 ```{r}
+resCluster3 <- plotClusterEnrichment(3, returnResults=TRUE)
 extracellular_tensile_strength_genes <- resCluster3@geneSets$`GO:0030020`
 extracellular_tensile_strength_nonEDS <- c()
 extracellular_tensile_strength_EDS <- c()
