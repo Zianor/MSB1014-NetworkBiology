@@ -3,7 +3,6 @@ title: "Heat Diffusion"
 output: html_notebook
 ---
 
-
 ```{r}
 df = read.csv("deg.txt", header=TRUE)
 ```
@@ -22,17 +21,21 @@ copyVisualStyle("default", "diffusion")
 setVisualStyle("diffusion")
 deleteStyleMapping("diffusion","NODE_FILL_COLOR")
 ```
+
 # Select network
+
 ```{r}
 networkSuid <- getNetworkSuid()
 print(networkSuid)
 ```
 
-
 # select start nodes
+
 ```{r}
 edsGeneSymbols = c("ADAMTS2", "AEBP1", "B3GALT6", "B4GALT7", "C1R", "C1S", "CCBE1", "CHST14", "COL12A1", "COL1A1", "COL1A2", "COL3A1","COL5A1", "COL5A2", "DSE", "FKBP14", "PLOD1", "PRDM5", "SLC39A13", "SLC6A5", "TNXB", "ZNF469")
+```
 
+```{r}
 knownEDS.table <- getTableColumns('node','knownEDS', network=networkSuid)
 edsNodes <- row.names(knownEDS.table)[knownEDS.table$knownEDS == TRUE]
 cat(paste(edsNodes, collapse=", "))
@@ -43,21 +46,26 @@ setNodeBorderWidthBypass(edsNodes,5)
 ```
 
 # Diffusion
+
 ```{r}
 diffusionBasic()
 clearSelection()
 setNodeColorMapping("diffusion_output_heat", c(0,0.5), c("#FFFFFF", "#006699"), style="diffusion")
 ```
+
 # select nodes with highest ranks and look at diffuasion heat before to get a feeling for the amount of hot nodes
+
 ```{r}
 networkSuidDiffusion <- getNetworkSuid()
 cat(networkSuidDiffusion)
 nodesAfterDiffusion <- getTableColumns('node', c('knownEDS', "display name", "Entrez Gene", "diffusion_output_heat", "diffusion_input", "diffusion_output_rank"), network=networkSuidDiffusion)
 head(nodesAfterDiffusion[order(nodesAfterDiffusion$diffusion_output_rank),])
 ```
+
 ```{r}
 hist(nodesAfterDiffusion$diffusion_output_heat, breaks = "sturges")
 ```
+
 ```{r}
 cat(length(subset(nodesAfterDiffusion, diffusion_output_heat > 0.3)$diffusion_output_rank))
 cat("\n")
@@ -65,12 +73,14 @@ cat(length(subset(nodesAfterDiffusion, diffusion_output_heat > 0.2)$diffusion_ou
 cat("\n")
 cat(length(subset(nodesAfterDiffusion, diffusion_output_heat > 0.1)$diffusion_output_rank))
 ```
+
 ```{r}
 subset_without_eds <- subset(nodesAfterDiffusion, knownEDS == FALSE & diffusion_output_heat > 0.1)
 hotGenes <- subset_without_eds[order(subset_without_eds$diffusion_output_rank),]
 cat(paste("Amount of hot genes", length(hotGenes$diffusion_output_rank)))
 head(hotGenes, 15)
 ```
+
 # Enrichment on hot genes (compare to mcode cluster 3 as well)
 
 ```{r}
@@ -99,3 +109,105 @@ plotMFEnrichment(hotGenes$`Entrez Gene`)
 hotGenes$`Entrez Gene`
 ```
 
+# Check for overlap with mcode cluster 3 genes
+
+```{r}
+mcode_cluster_3_genes = read.csv(paste("data/networks/MCODE/mcode_cluster_", 3,"_nodes.txt", sep=""), header=TRUE)$`display.name`
+cat(paste(mcode_cluster_3_genes, collapse=", "))
+cat("\n")
+cat(paste(hotGenes$`display name`, collapse=", "))
+cat("\n")
+cat("intersect\n")
+intersect(mcode_cluster_3_genes, hotGenes$`display name`)
+```
+
+No intersect besides EDS genes but still similar molecular function. Are the MCODE cluster 3 genes even in community cluster 1?#
+
+# the heat decays pretty quick for such a large graph, so repeat with higher spread
+
+```{r}
+networkSuid <- getNetworkSuid()
+print(networkSuid)
+```
+
+```{r}
+clearSelection()
+copyVisualStyle("default", "diffusion")
+setVisualStyle("diffusion")
+deleteStyleMapping("diffusion","NODE_FILL_COLOR")
+```
+
+## select start nodes
+
+```{r}
+edsGeneSymbols = c("ADAMTS2", "AEBP1", "B3GALT6", "B4GALT7", "C1R", "C1S", "CCBE1", "CHST14", "COL12A1", "COL1A1", "COL1A2", "COL3A1","COL5A1", "COL5A2", "DSE", "FKBP14", "PLOD1", "PRDM5", "SLC39A13", "SLC6A5", "TNXB", "ZNF469")
+
+knownEDS.table <- getTableColumns('node','knownEDS', network=networkSuid)
+edsNodes <- row.names(knownEDS.table)[knownEDS.table$knownEDS == TRUE]
+cat(paste(edsNodes, collapse=", "))
+cat(paste("\n", length(edsNodes), "nodes related to other EDS types"))
+selectNodes(edsNodes)
+setNodeBorderColorBypass(edsNodes,"#FF55AA")
+setNodeBorderWidthBypass(edsNodes,5)
+```
+
+## Diffusion
+
+```{r}
+diffusionAdvanced(time=0.3)
+clearSelection()
+setNodeColorMapping("diffusion_output_heat", c(0,0.5), c("#FFFFFF", "#006699"), style="diffusion")
+```
+
+```{r}
+networkSuidDiffusion03 <- getNetworkSuid()
+cat(networkSuidDiffusion03)
+nodesAfterDiffusion03 <- getTableColumns('node', c('knownEDS', "display name", "Entrez Gene", "diffusion_output_heat", "diffusion_input", "diffusion_output_rank", "knownEDS"), network=networkSuidDiffusion03)
+head(nodesAfterDiffusion03[order(nodesAfterDiffusion03$diffusion_output_rank),])
+```
+
+```{r}
+hist(nodesAfterDiffusion03$diffusion_output_heat, breaks = "sturges")
+```
+
+```{r}
+cat(length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.3)$diffusion_output_rank))
+cat("\n")
+cat(length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.2)$diffusion_output_rank))
+cat("\n")
+cat(length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.1)$diffusion_output_rank))
+cat("\n")
+cat(length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.05)$diffusion_output_rank))
+```
+
+```{r}
+subset_without_eds03 <- subset(nodesAfterDiffusion03, knownEDS == FALSE & diffusion_output_heat > 0.1)
+hotGenes03 <- subset_without_eds03[order(subset_without_eds03$diffusion_output_rank),]
+cat(paste("Amount of hot genes", length(hotGenes03$diffusion_output_rank)))
+head(hotGenes03, 15)
+```
+
+```{r}
+plotMFEnrichment(hotGenes03$`Entrez Gene`)
+```
+# Check for overlap with mcode cluster 3 genes
+
+```{r}
+mcode_cluster_3_genes = read.csv(paste("data/networks/MCODE/mcode_cluster_", 3,"_nodes.txt", sep=""), header=TRUE)$`display.name`
+cat(paste(mcode_cluster_3_genes, collapse=", "))
+cat("\n")
+cat(paste(hotGenes03$`display name`, collapse=", "))
+cat("\n")
+cat("intersect\n")
+intersectingGenes <-intersect(mcode_cluster_3_genes, hotGenes03$`display name`)
+cat(paste(intersectingGenes, collapse=", "))
+cat("\n setdiff \n")
+nonIntersecting <- c()
+for(gene in hotGenes03$`display name`) {
+  if (!(gene %in% edsGeneSymbols) & !(gene %in% intersectingGenes)) {
+    nonIntersecting <- c(nonIntersecting, gene)
+  }
+}
+cat("\n")
+cat(paste(nonIntersecting, collapse=", "))
+```

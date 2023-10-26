@@ -104,13 +104,14 @@ plotClusterEnrichment <- function(i, dot=FALSE, returnResults=FALSE) {
       )
   resCluster.df <- as.data.frame(resCluster)
   cat(capture.output(head(resCluster), sep="\n"))
-  if(dot) {
+  if(returnResults){
+    return(resCluster)
+  } else {
+    if(dot) {
     return(dotplot(resCluster, showCategory = 8, title = paste("MCODE cluster ",i, sep=""), font.size=11))
   } else {
     return(barplot(resCluster, showCategory = 8, title = paste("MCODE cluster ",i, sep=""), font.size=11))
   }
-  if(returnResults){
-    return(resCluster)
   }
 }
 ```
@@ -187,6 +188,17 @@ cat(paste("In total", length(extracellular_structure_EDS), "EDS genes of overall
 cat("\n")
 cat(paste("Non-EDS genes: ", nonEDSGenesString))
 ```
-
+# look at chromatin enrichment
+```{r}
+resCluster2 <- plotClusterEnrichment(i=2, returnResults = TRUE)
+chromatin_genes <- c()
+for(gene in resCluster2@geneSets$`GO:0030527`) {
+  if(gene %in% resCluster2@gene) {
+    chromatin_genes <- c(chromatin_genes, gene)
+  }
+}
+chromatinGenesString <- paste(chromatin_genes, collapse = ", ")
+cat(paste("Chromatin Genes: ", chromatinGenesString))
+```
 
 

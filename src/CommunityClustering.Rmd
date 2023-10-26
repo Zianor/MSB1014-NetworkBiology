@@ -14,6 +14,9 @@ library(igraph)
 library(clusterProfiler)
 library(org.Hs.eg.db)
 
+```
+
+```{r}
 
 cytoscapePing ()
 ```
@@ -34,6 +37,7 @@ nodeThreshold <- 15
 
 # Clustering in cytoscape
 ```{r}
+if(FALSE) {
 clustermaker = paste("cluster glay network=SUID:", networkSuid, sep="")
 res <- commandsGET(clustermaker)
 num <- as.numeric(gsub("Clusters: ", "", res[1]))
@@ -70,7 +74,34 @@ for(i in 1:num) {
     barplot(res, showCategory = 20, title = paste("Biological process glay cluster", clusterNumber))
   }
 }
+}
 ```
+## Check whether the MCODE cluster 1 ECM genes are in the cluster
+
+```{r}
+ecmGenes <- c("COL10A1", "COL15A1", "PCOLCE", "COL5A3", "COL18A1", "COL21A1", "COL27A1")
+tableCluster1 <- read.csv(paste("data/networks/glay/glay_cluster", 1,"_nodes.txt", sep=""), header=TRUE)
+for(gene in ecmGenes) {
+  cat(paste("ECM gene", gene ,"in glay cluster 1?", gene %in% tableCluster1$`display.name`, "\n"))
+}
+```
+## Check whether the chromatin genes are in a cluster (I saw some in cluster 5)
+There are none in community cluster 1
+```{r}
+chromatinGenes <- c(
+  "H1-3", "H1-4", "H1-5", "H2AC8", "H2AC7", "H2AC13", "H2AC16", "H2AC4", 
+  "H2AC17", "H2BC8", "H2BC15", "H2BC14", "H2BC7", "H2BC6", "H2BC9", "H2BC10", 
+  "H2BC4", "H2BC21", "H3C1", "H3C4", "H3C3", "H3C6", "H3C11", "H3C8", "H3C12", 
+  "H3C2", "H4C1", "H4C6", "H4C12", "H4C11", "H4C3", "H4C8", "H4C13", "H3C7", 
+  "H2AC11", "H2AC21")
+tableCluster5 <- read.csv(paste("data/networks/glay/glay_cluster", 5,"_nodes.txt", sep=""), header=TRUE)
+for(gene in chromatinGenes) {
+  cat(paste("chromatin gene", gene ,"in glay cluster 5?", gene %in% tableCluster5$`display.name`, "\n"))
+}
+```
+
+
+
 ## Enrichment for Biological Process
 ```{r}
 enrichmentBiologicalProcess <- function(i) {
@@ -109,15 +140,9 @@ enrichmentBiologicalProcess(4)
 ```{r}
 enrichmentBiologicalProcess(5)
 ```
-
+# Only 15 genes so probably not helpful (Why 15, it should be 18???)
 ```{r}
 enrichmentBiologicalProcess(6)
-```
-
-
-
-```{r}
-gseBiologicalProcess(1)
 ```
 
 ## Analyse for cellular component as well
