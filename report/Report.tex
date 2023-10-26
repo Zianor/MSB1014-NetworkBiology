@@ -2,9 +2,9 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
-\usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{subcaption}
 \usepackage[left=2.7cm, right=2.7cm, top=2.5cm, bottom=1.5cm, includefoot, footskip=0.7cm]{geometry}
 \usepackage{xcolor}
 
@@ -48,6 +48,11 @@
   afterskip=.125\baselineskip,
   font={\normalsize\itshape},
 ]{subsubsection}
+\RedeclareSectionCommands[
+  beforeskip=.05\baselineskip,
+  afterskip=.05\baselineskip,
+  font={\normalsize},
+]{paragraph}
 
 \begin{document}
 \begin{titlepage}
