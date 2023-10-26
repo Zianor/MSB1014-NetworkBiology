@@ -39,14 +39,11 @@ To find connections to ECM in the enrichment analysis is consistent with finding
 
 \paragraph{Upregulated MCODE cluster}
 
-The two larger, upregulated MCODE clusters show no over-representation in ECM-terms, as is shown in figure \ref{fig:mcode-cluster-mf}.
-
-\begin{itemize}
-	\item mcode cluster 2: 	GO:0030527 - structural constituent of chromatin enriched, downregulated genes involved in processes related to chromatin in vEDS \cite{Chiarelli2018}
-\end{itemize}
+The two larger, upregulated MCODE clusters show no over-representation in ECM-terms, as is shown in figure \ref{fig:mcode-cluster-mf}. It is noticable, that the enrichment of the first cluster shows, that not many genes are part of the enriched terms. For the second cluster, the gene ratio is much higher, with up to around 80\,\% of the genes being involved in the second tow terms. Therefore the enrichment of the first cluster does not provide much insight in terms of molecular function in hEDS patients.
 
  \begin{figure}[htb]
  	\centering
+ 	\caption*{\textbf{Molecular function enrichment for the two larger upregulated clusters}}
 		\begin{subfigure}{.49\textwidth}
 			\centering
  			\includegraphics[width=\textwidth]{fig/mf-mcode-cluster1}
@@ -61,12 +58,14 @@ The two larger, upregulated MCODE clusters show no over-representation in ECM-te
  	\label{fig:mcode-cluster-mf}
  \end{figure}
 
+On the other hand, the up-regulation seen in the second cluster for the GO-term GO:0030527, the structural constituent of chromatin is interesting, because earlier findings found down-regulated genes involved in processes related to chromatin in vEDS \cite{Chiarelli2018}.
+
 
 \subsubsection{Community Clustering}
 
-Community Clustering results in six clusters with more than 15 genes. Three of them are very small and loosely connected clusters, containing 18 to 29 nodes and approximately the same amount of connections as nodes. Since clusters of less than 20 genes are not large enough for analysis of biological processes, smaller clusters are ommited from the analysis. Additionally there are two medium-sized highly connected clusters with respectively 76 nodes and 100 connections and 105 nodes and 2330 connectinos and one very large cluster with 363 nodes and 1661 connections. Especially the medium-sized clusters are highly interconnected and contain mostly upregulated genes.
+Community Clustering results in six clusters with more than 15 genes. Three of them are very small and loosely connected clusters, containing 18 to 29 genes and approximately the same amount of connections as genes. Since clusters of less than 20 genes are not large enough for analysis of biological processes, smaller clusters are ommited from the analysis. Additionally there are two medium-sized highly connected clusters with respectively 76 genes and 100 connections and 105 genes and 2330 connectinos and one very large cluster with 363 gens and 1661 connections. Especially the medium-sized clusters are highly interconnected and contain mostly upregulated genes.
 
 \paragraph{Largest Community Cluster}
 
-The largest cluster contains a mix of up-regulated and down-regulated genes and also includes all 21 genes known to cause other EDS types.
+The largest cluster contains a mix of up-regulated and down-regulated genes and also includes all 21 genes known to cause other EDS types. 
 
