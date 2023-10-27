@@ -40,7 +40,6 @@ GO-enrichment is performed on the DEGs to acquire an overview of over-represente
   		\caption{Cellular Component}
   	\end{subtable}
   	\hfill
-  	\vspace{0.5cm}
   	\begin{subtable}[t]{\textwidth}
   		\centering
   		\begin{tabular}{r|p{8cm}}
@@ -91,12 +90,12 @@ The third, smaller cluster, shown in Figure \ref{fig:mcode3}, contains mainly up
 	\begin{subfigure}{.49\textwidth}
 		\centering
  		\includegraphics[width=\textwidth]{fig/mcode-cluster-without-enrichment.png}
- 			\caption{Without visualisation of the ECM GO term}
+ 			\caption{Without visualisation of the ECM GO-term}
  	\end{subfigure}
  	\begin{subfigure}{.49\textwidth}
  		\centering
  		\includegraphics[width=\textwidth]{fig/mcode-cluster-eds-genes-with-ecm.png}
- 		\caption{With visualisation of the ECM GO term}
+ 		\caption{With visualisation of the ECM GO-term}
  	\end{subfigure}
 	\caption[MCODE cluster with EDS genes]{\centering The MCODE cluster contains many genes known to cause other types of EDS.}
 	\label{fig:mcode3}
@@ -108,7 +107,7 @@ Finding connections to ECM in the enrichment analysis is consistent with similar
 
 \paragraph{Up-regulated MCODE Clusters.} The two larger, up-regulated MCODE clusters show no relation to ECM terms, as is shown in Figure \ref{fig:mcode-cluster-mf}. It is noticeable that only a few genes of the first cluster are part of the enriched terms, while the gene ratio is much higher for the second cluster, with up to around 80\,\% of the genes being involved in the first two terms. Therefore, the enrichment of the first cluster provides little insight into molecular function in hEDS patients. On the other hand, the up-regulation seen in the second cluster for the GO-term GO:0030527, the structural constituent of chromatin, is interesting because earlier research found down-regulated genes involved in processes related to chromatin in vEDS \cite{Chiarelli2018}.
 
- \begin{figure}[htb]
+ \begin{figure}[htb!]
  	\centering
  	\caption*{\textbf{Molecular function enrichment for the two larger up-regulated clusters}}
 		\begin{subfigure}{.49\textwidth}
@@ -133,7 +132,7 @@ Community Clustering finds six clusters of more than 15 genes. Three are very sm
 \paragraph{Medium-Sized Community Clusters.}
 The medium-sized clusters are highly interconnected and contain mainly up-regulated genes. Genes related to nucleosome and protein-DNA complex are part of one of the clusters, while the genes related to the chromosomal region are clustered in the other one. This distribution is mirrored in the enriched biological processes shown in Figure \ref{fig:medium-community-bp}. In the cluster with nucleosome-related genes, five genes are notably highly up-regulated: H3C2, H3C7, H2BC10, ASF1B and WDR37. The first four are nucleosome-related, while WDR37 is related to cell cycle progression, signal transduction and gene regulation. The other cluster has no genes that are significantly more up-regulated than others.
 
- \begin{figure}[htb]
+ \begin{figure}[hbt!]
  	\centering
  	\caption*{\textbf{Biological process enrichment for the medium-sized Community Clusters}}
 		\begin{subfigure}{.49\textwidth}
@@ -163,7 +162,7 @@ The analysis is consistent with previous research in finding DEGs that influence
 
 Moreover, clustering revealed that mainly up-regulated genes are closely connected; partially overlapping clusters were found by MCODE and Community Clustering. Some of the related GO terms are known to be involved in other EDS types and to involve down-regulated genes there are up-regulated in the given data. Generally, hEDS has a broad spectrum of clinical representations that might be caused by multiple components being involved as part of the molecular cause. This spectrum is reflected in the found clusters representing different processes involved.
 
-Clear candidate genes cannot be provided although genes of interest are described. Future work should include results from pathway analysis and analyse the created network with the found clusters in more detail.
+Clear candidate genes cannot be provided although affected biological processes are identified and genes of interest described. Future work should include results from pathway analysis and analyse the created network with the found clusters in more detail.
 %[TODO: list some particular interesting genes]
 
 %\begin{itemize}
