@@ -22,8 +22,10 @@ cytoscapePing ()
 ```
 
 ```{r}
+if(FALSE) {
 networkSuid = getNetworkSuid()
 print(networkSuid)
+}
 ```
 
 ```{r}
@@ -38,42 +40,42 @@ nodeThreshold <- 15
 # Clustering in cytoscape
 ```{r}
 if(FALSE) {
-clustermaker = paste("cluster glay network=SUID:", networkSuid, sep="")
-res <- commandsGET(clustermaker)
-num <- as.numeric(gsub("Clusters: ", "", res[1]))
-print(paste("Found", num, "clusters"))
-
-clusterNumber <- 0
-# for each cluster
-for(i in 1:num) {
-  setCurrentNetwork(network=networkSuid)
-  clearSelection(network=networkSuid)
-  currentCluster <- i
-  selectedNodes <- selectNodes(network=networkSuid, currentCluster, by.col="__glayCluster") 
-  if(length(selectedNodes$nodes) > nodeThreshold) {
-    clusterNumber <- clusterNumber + 1
-    # sub network creation
-    subnetwork_suid <- createSubnetwork(nodes="selected", network=networkSuid)
-    table <- getTableColumns(table="node",columns = c("display name", "Ensembl", "Entrez Gene"), network = as.numeric(subnetwork_suid))
-    # save network
-    exportNetwork(paste("data/networks/glay/glay_cluster_", clusterNumber, ".sif", sep=""), network=subnetwork_suid)
-    res <- clusterProfiler::enrichGO(
-      gene = table$`display name`,
-      OrgDb = org.Hs.eg.db,
-      keyType = "SYMBOL",
-      ont = "BP",
-      pAdjustMethod ="BH",
-      pvalueCutoff = 0.05,
-      qvalueCutoff = 0.05,
-      readable = TRUE
-      )
-    res.df <- as.data.frame(res)
-    write.table(res.df, file=paste('data/enrichment/biological-process/glay_cluster', clusterNumber, '_bp.txt', sep=""), row.names=F, sep=",")
-    write.table(table, file=paste("data/networks/glay/glay_cluster", clusterNumber,"_nodes.txt", sep=""), row.names=F, sep=",")
-    assign(paste("glay_Cluster_", clusterNumber, sep=""), res.df)
-    barplot(res, showCategory = 20, title = paste("Biological process glay cluster", clusterNumber))
+  clustermaker = paste("cluster glay network=SUID:", networkSuid, sep="")
+  res <- commandsGET(clustermaker)
+  num <- as.numeric(gsub("Clusters: ", "", res[1]))
+  print(paste("Found", num, "clusters"))
+  
+  clusterNumber <- 0
+  # for each cluster
+  for(i in 1:num) {
+    setCurrentNetwork(network=networkSuid)
+    clearSelection(network=networkSuid)
+    currentCluster <- i
+    selectedNodes <- selectNodes(network=networkSuid, currentCluster, by.col="__glayCluster") 
+    if(length(selectedNodes$nodes) > nodeThreshold) {
+      clusterNumber <- clusterNumber + 1
+      # sub network creation
+      subnetwork_suid <- createSubnetwork(nodes="selected", network=networkSuid)
+      table <- getTableColumns(table="node",columns = c("display name", "Ensembl", "Entrez Gene"), network = as.numeric(subnetwork_suid))
+      # save network
+      exportNetwork(paste("data/networks/glay/glay_cluster_", clusterNumber, ".sif", sep=""), network=subnetwork_suid)
+      res <- clusterProfiler::enrichGO(
+        gene = table$`display name`,
+        OrgDb = org.Hs.eg.db,
+        keyType = "SYMBOL",
+        ont = "BP",
+        pAdjustMethod ="BH",
+        pvalueCutoff = 0.05,
+        qvalueCutoff = 0.05,
+        readable = TRUE
+        )
+      res.df <- as.data.frame(res)
+      write.table(res.df, file=paste('data/enrichment/biological-process/glay_cluster', clusterNumber, '_bp.txt', sep=""), row.names=F, sep=",")
+      write.table(table, file=paste("data/networks/glay/glay_cluster", clusterNumber,"_nodes.txt", sep=""), row.names=F, sep=",")
+      assign(paste("glay_Cluster_", clusterNumber, sep=""), res.df)
+      barplot(res, showCategory = 20, title = paste("Biological process glay cluster", clusterNumber))
+    }
   }
-}
 }
 ```
 ## Check whether the MCODE cluster 1 ECM genes are in the cluster
@@ -118,7 +120,7 @@ enrichmentBiologicalProcess <- function(i) {
       )
   res.df <- as.data.frame(res)
   cat(capture.output(head(res), sep="\n"))
-  barplot(res, showCategory = 10, title = paste("Biological Process glay cluster", i), font.size = 11)
+  return(barplot(res, showCategory = 10, title = paste("Biological Process glay cluster", i), font.size = 11))
 }
 ```
 
@@ -294,6 +296,7 @@ enrichWPForCluster <- function(i) {
   head(wp, 15)
 }
 ```
+
 
 ```{r}
 enrichWPForCluster(1)

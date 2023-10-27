@@ -211,3 +211,35 @@ for(gene in hotGenes03$`display name`) {
 cat("\n")
 cat(paste(nonIntersecting, collapse=", "))
 ```
+## Which are the hottest genes that are no EDS genes
+```{r}
+mcode_cluster_3_genes = read.csv(paste("data/networks/MCODE/mcode_cluster_", 3,"_nodes.txt", sep=""), header=TRUE)$`display.name`
+cat(paste("Genes with heat > 0.3:", length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.3 & knownEDS == FALSE)$diffusion_output_rank)))
+cat("\n")
+cat(paste(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.3 & knownEDS == FALSE)$`display name`, collapse=", "))
+cat("\n ---- \n")
+cat(paste("Genes with heat > 0.2:", length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.2 & knownEDS == FALSE)$diffusion_output_rank)))
+cat("\n")
+cat(paste(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.2 & knownEDS == FALSE)$`display name`, collapse=", "))
+cat("\n ---- \n")
+cat(paste("Genes with heat > 0.1:", length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.1 & knownEDS == FALSE)$diffusion_output_rank)))
+cat("\n")
+nonEDSHot03 <- subset(nodesAfterDiffusion03, diffusion_output_heat > 0.1 & knownEDS == FALSE)
+cat(paste(nonEDSHot03$`display name`, collapse=", "))
+cat("\nGenes without the ones in EDS MCODE cluster\n")
+nonEDSHot03_notInMCODE <- c()
+for(gene in nonEDSHot03$`display name`) {
+  if (!gene %in% mcode_cluster_3_genes) {
+    nonEDSHot03_notInMCODE <- c(nonEDSHot03_notInMCODE, gene)
+  }
+}
+cat(paste(nonEDSHot03_notInMCODE, collapse=", "))
+cat(paste(" (in total", length(nonEDSHot03_notInMCODE), ")"))
+cat("\n ---- \n")
+cat(paste("Genes with heat > 0.05:", length(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.05 & knownEDS == FALSE)$diffusion_output_rank)))
+cat("\n")
+cat(paste(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.05 & knownEDS == FALSE)$`display name`, collapse=", "))
+cat("\n ---- \n")
+```
+
+

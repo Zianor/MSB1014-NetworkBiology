@@ -83,7 +83,9 @@ head(ggo_cc, 25)
 ego_cc <- enrichGO(gene=geneIDs, "org.Hs.eg.db", ont = "CC", readable = T, pvalueCutoff = 0.05)
 head(ego_cc,20)
 ```
-Look which genes are in collagen-containing extracellular matrix
+GO-Term without description: OBSOLETE. A protein complex that plays a role in the process of DNA packaging.
+
+###### Look which genes are in collagen-containing extracellular matrix
 ```{r}
 geneSymbols_ego_cc <- bitr(ego_cc@geneSets$`GO:0062023`, fromType="ENTREZID", toType="SYMBOL", OrgDb="org.Hs.eg.db")
 cat(paste(geneSymbols_ego_cc$SYMBOL, collapse=", "))

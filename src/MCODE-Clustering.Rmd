@@ -40,6 +40,7 @@ nodeThreshold <- 15
 ```
 # Perform clustering and save clusters
 ```{r}
+if(FALSE) {
 clustermaker = paste("cluster mcode network=SUID:", networkSuid, sep="")
 res <- commandsGET(clustermaker)
 num <- as.numeric(gsub("Clusters: ", "", res[1]))
@@ -86,6 +87,7 @@ for(i in 1:num) {
     # plot enrichment results
     barplot(res, showCategory = 10, title = paste("Molecular Function MCODE cluster", clusterNumber))
   }
+}
 }
 ```
 
