@@ -26,9 +26,18 @@ The third, smaller cluster, shown in Figure \ref{fig:mcode3}, contains mainly up
 
 \begin{figure}[htb!]
 	\centering
-	\caption*{\textbf{MCODE cluster 3}}
-	\includegraphics[width=0.7\textwidth]{fig/MCODE-cluster3.png}
-	\caption[MCODE cluster 3]{\centering The MCODE cluster contains many genes known to cause other types of EDS. [TODO: add legend for shape, border and colour]}
+	\caption*{\textbf{MCODE cluster with EDS genes}}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+ 		\includegraphics[width=\textwidth]{fig/mcode-cluster-without-enrichment.png}
+ 			\caption{Without visualization of the ECM GO term}
+ 	\end{subfigure}
+ 	\begin{subfigure}{.49\textwidth}
+ 		\centering
+ 		\includegraphics[width=\textwidth]{fig/mcode-cluster-eds-genes-with-ecm.png}
+ 		\caption{With visualization of the ECM GO term}
+ 	\end{subfigure}
+	\caption[MCODE cluster with EDS genes]{\centering The MCODE cluster contains many genes known to cause other types of EDS. [TODO: add legend for shape, border and colour]}
 	\label{fig:mcode3}
 \end{figure}
 
@@ -62,7 +71,15 @@ On the other hand, the up-regulation seen in the second cluster for the GO-term 
 
 \subsubsection{Community Clustering}
 
-Community Clustering results in six clusters with more than 15 genes. Three are very small and loosely connected clusters, containing 18 to 29 genes and approximately the same amount of connections as genes. Since clusters of less than 20 genes are not large enough for analysis of biological processes, smaller clusters are omitted from the analysis. Additionally, there are two medium-sized highly connected clusters with 76 genes and 100 connections, and 105 genes and 2330 connections, respectively, and one huge cluster with 363 genes and 1661 connections. The medium-sized clusters are highly interconnected and contain mainly up-regulated genes.
+Community Clustering results in six clusters with more than 15 genes. Three are very small and loosely connected clusters, containing 18 to 29 genes and approximately the same amount of connections as genes. Since clusters of less than 20 genes are not large enough for analysis of biological processes, smaller clusters are omitted from the analysis. Additionally, there are two medium-sized highly connected clusters with 76 genes and 100 connections, and 105 genes and 2330 connections, respectively, and one huge cluster with 363 genes and 1661 connections.
+
+\paragraph{Medium Sized Community Clusters}
+
+The medium-sized clusters are highly interconnected and contain mainly up-regulated genes. Genes related to Nucleosome and protein-DNA complex are part of one of the clusters while the genes related to the chromosomal region are clustered in the other one.
+\begin{itemize}
+	\item first one: 5 highly differentielly expressed genes noticeable: H3C2, H3C7, H2BC10, ASF1B, WDR37
+\end{itemize}
+
 
 \paragraph{Largest Community Cluster}
 
@@ -73,14 +90,6 @@ Heat Diffusion starting at EDS genes finds 39 DEG with a heat $> 0.1$ beside the
 % CLEC3B, LAMA5, MAN1B1, PLS3, TNC (identified in paper), ADAMTS4, LAMB3, LAMB1, SLC4A11, MYLK, MKX, OGN, LOXL4, ASPN, MYH11, OLFML2B, COMP, C4B, HS6ST1 (identified in paper), FNDC1, INHBA, CHPF, LOXL1, GPC4, NUDCD1, ADAMTSL4, CSPG4, SULF1, NETO2 (identified in paper), CNIH3, ITGBL1
 
 [TODO: check whether they were mentioned in other research and if we see them somewhere else]
-
-\paragraph{Medium Sized Community Clusters}
-
-\begin{itemize}
-	\item Nucleosome and protein-DNA complex in one of the two medium sized clusters while the genes related to the chromosomal region are clustered in the other one.
-	\item first one: 5 highly differentielly expressed genes noticeable: H3C2, H3C7, H2BC10, ASF1B, WDR37
-\end{itemize}
-
 
 \subsection{Discussion and Conclusion}
 
