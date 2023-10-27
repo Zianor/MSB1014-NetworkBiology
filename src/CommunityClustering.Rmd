@@ -120,12 +120,12 @@ enrichmentBiologicalProcess <- function(i) {
       )
   res.df <- as.data.frame(res)
   cat(capture.output(head(res), sep="\n"))
-  return(barplot(res, showCategory = 10, title = paste("Biological Process glay cluster", i), font.size = 11))
+  return(barplot(res, showCategory = 8, title = paste("Biological Process community cluster", i), font.size = 11))
 }
 ```
 
 ```{r}
-enrichmentBiologicalProcess(1)
+enrichmentBiologicalProcess(1, fig.dpi=300, fig.height=4, fig.width=5)
 ```
 ```{r}
 enrichmentBiologicalProcess(2)
@@ -135,11 +135,11 @@ enrichmentBiologicalProcess(2)
 enrichmentBiologicalProcess(3)
 ```
 
-```{r}
+```{r, fig.dpi=300, fig.height=4, fig.width=6}
 enrichmentBiologicalProcess(4)
 ```
 
-```{r}
+```{r, fig.dpi=300, fig.height=4, fig.width=6}
 enrichmentBiologicalProcess(5)
 ```
 # Only 15 genes so probably not helpful (Why 15, it should be 18???)

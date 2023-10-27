@@ -159,6 +159,10 @@ kk <- enrichKEGG(
 )
 head(kk, 15)
 ```
+```{r}
+barplot(kk)
+```
+
 ### KEGG pathway gene set enrichment analysis
 ```{r}
 kkGSE <- gseKEGG(

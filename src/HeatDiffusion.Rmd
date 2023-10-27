@@ -241,5 +241,54 @@ cat("\n")
 cat(paste(subset(nodesAfterDiffusion03, diffusion_output_heat > 0.05 & knownEDS == FALSE)$`display name`, collapse=", "))
 cat("\n ---- \n")
 ```
+# Look at hot gene go terms
+```{r}
 
+resHotNotEDSMF <- clusterProfiler::groupGO(
+      gene = nonEDSHot03_notInMCODE,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "MF",
+      level=3,
+      readable = TRUE
+      )
+resHotNotEDSMF <- resHotNotEDSMF[order(resHotNotEDSMF$Count, decreasing=T),]
+head(resHotNotEDSMF, 20)
+```
 
+```{r}
+resHotNotEDSCC <- clusterProfiler::groupGO(
+      gene = nonEDSHot03_notInMCODE,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "CC",
+      level=3,
+      readable = TRUE
+      )
+resHotNotEDSCC <- resHotNotEDSCC[order(resHotNotEDSCC$Count, decreasing=T),]
+head(resHotNotEDSCC, 20)
+```
+
+```{r}
+resHotNotEDSBP <- clusterProfiler::groupGO(
+      gene = nonEDSHot03_notInMCODE,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "BP",
+      level=3,
+      readable = TRUE
+      )
+resHotNotEDSBP <- resHotNotEDSBP[order(resHotNotEDSBP$Count, decreasing=T),]
+head(resHotNotEDSBP, 20)
+```
+```{r}
+resAll <- clusterProfiler::enrichGO(
+      gene = nonEDSHot03_notInMCODE,
+      OrgDb = org.Hs.eg.db,
+      keyType = "SYMBOL",
+      ont = "all",
+      readable = TRUE
+      )
+resAll.df <- as.data.frame(resAll)
+head(resAll)
+```
